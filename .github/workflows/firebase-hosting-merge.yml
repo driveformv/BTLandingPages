@@ -9,8 +9,28 @@ name: Deploy to Firebase Hosting on merge
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+      REACT_APP_FIREBASE_AUTH_DOMAIN: landing-pages-ca8fc.firebaseapp.com
+      REACT_APP_FIREBASE_PROJECT_ID: landing-pages-ca8fc
+      REACT_APP_FIREBASE_STORAGE_BUCKET: landing-pages-ca8fc.firebasestorage.app
+      REACT_APP_FIREBASE_MESSAGING_SENDER_ID: 786684458200
+      REACT_APP_FIREBASE_APP_ID: 1:786684458200:web:73e30e20b4a72bc805d3ad
+      REACT_APP_RESEND_API_KEY: ${{ secrets.REACT_APP_RESEND_API_KEY }}
     steps:
       - uses: actions/checkout@v3
+      - name: Create .env file
+        run: |
+          echo "REACT_APP_FIREBASE_API_KEY=AIzaSyCHbPkizviKd_TC7qMmUsLy-KjI-qhrmVo" > .env
+          echo "REACT_APP_FIREBASE_AUTH_DOMAIN=landing-pages-ca8fc.firebaseapp.com" >> .env
+          echo "REACT_APP_FIREBASE_PROJECT_ID=landing-pages-ca8fc" >> .env
+          echo "REACT_APP_FIREBASE_STORAGE_BUCKET=landing-pages-ca8fc.firebasestorage.app" >> .env
+          echo "REACT_APP_FIREBASE_MESSAGING_SENDER_ID=786684458200" >> .env
+          echo "REACT_APP_FIREBASE_APP_ID=1:786684458200:web:5a087cb7aaa4168105d3ad" >> .env
+          echo "REACT_APP_RESEND_API_KEY=${{ secrets.REACT_APP_RESEND_API_KEY }}" >> .env
+      - name: Update firebase-config.js
+        run: |
+          sed -i "s/apiKey: \".*\"/apiKey: \"AIzaSyCHbPkizviKd_TC7qMmUsLy-KjI-qhrmVo\"/" public/firebase-config.js
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

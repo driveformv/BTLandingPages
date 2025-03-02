@@ -16,12 +16,12 @@
 const firebaseConfig = {
   // In a real production environment, these values would be injected by the build process
   // from environment variables, not hardcoded here
-  apiKey: "AIzaSyDQP53K2RxwKDsNR8gyl9qMpyqzJQKRVvQ",
+  apiKey: "AIzaSyCHbPkizviKd_TC7qMmUsLy-KjI-qhrmVo",
   authDomain: "landing-pages-ca8fc.firebaseapp.com",
   projectId: "landing-pages-ca8fc",
   storageBucket: "landing-pages-ca8fc.firebasestorage.app",
   messagingSenderId: "786684458200",
-  appId: "1:786684458200:web:73e30e20b4a72bc805d3ad"
+  appId: "1:786684458200:web:5a087cb7aaa4168105d3ad"
 };
 
 // Initialize Firebase if the SDK is loaded
