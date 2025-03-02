@@ -2,15 +2,8 @@
 const { initializeApp } = require("firebase/app");
 const { getFirestore, collection, addDoc, getDocs } = require("firebase/firestore");
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCHbPkizviKd_TC7qMmUsLy-KjI-qhrmVo",
-  authDomain: "landing-pages-ca8fc.firebaseapp.com",
-  projectId: "landing-pages-ca8fc",
-  storageBucket: "landing-pages-ca8fc.firebasestorage.app",
-  messagingSenderId: "786684458200",
-  appId: "1:786684458200:web:73e30e20b4a72bc805d3ad"
-};
+// Import Firebase configuration from firebase-config.js
+const { firebaseConfig } = require("./firebase-config");
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

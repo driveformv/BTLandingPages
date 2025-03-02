@@ -6,6 +6,8 @@
     <title>Test Firebase Storage Upload</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <!-- Load Firebase configuration from external file -->
+    <script src="firebase-config.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,18 +61,7 @@
     <div id="result"></div>
     
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQPFgyKuSQGGXdcI-3SHR3cOPJnR5qYDI",
-            authDomain: "landing-pages-ca8fc.firebaseapp.com",
-            projectId: "landing-pages-ca8fc",
-            storageBucket: "landing-pages-ca8fc.firebasestorage.app",
-            messagingSenderId: "786684458200",
-            appId: "1:786684458200:web:a9e7c5e1d5b9f9e9f9f9f9"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        // Firebase is initialized in firebase-config.js
         
         // Get a reference to the storage service
         const storage = firebase.storage();

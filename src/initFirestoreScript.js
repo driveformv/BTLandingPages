@@ -5,24 +5,8 @@
  * Run this script once to set up the initial data in Firestore.
  */
 
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
-
-// Firebase configuration from firebase.js
-const firebaseConfig = {
-  apiKey: "AIzaSyCHbPkizviKd_TC7qMmUsLy-KjI-qhrmVo",
-  authDomain: "landing-pages-ca8fc.firebaseapp.com",
-  projectId: "landing-pages-ca8fc",
-  storageBucket: "landing-pages-ca8fc.firebasestorage.app",
-  messagingSenderId: "786684458200",
-  appId: "1:786684458200:web:73e30e20b4a72bc805d3ad"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Cloud Firestore
-const db = getFirestore(app);
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { db } from "./firebase"; // Import db from firebase.js to reuse the configuration
 
 // Sample job data
 const initialJobs = [
