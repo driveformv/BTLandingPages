@@ -10,6 +10,7 @@ class FooterLinks extends Component {
       { icon: "mdi mdi-linkedin", link: "#" },
       { icon: "mdi mdi-google-plus", link: "#" },
       { icon: "mdi mdi-microsoft-xbox", link: "#" },
+      { icon: "mdi mdi-lock-outline", link: "/login" },
     ],
   };
   render() {

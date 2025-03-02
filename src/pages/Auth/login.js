@@ -83,16 +83,24 @@ const Login = () => {
     document.body.classList.add("bg-account-pages");
     document.body.classList.add("py-4");
     document.body.classList.add("py-sm-0");
-    document.getElementById("colorTheme").setAttribute("href","assets/colors/orange.css")
-
+    
+    // Check if colorTheme element exists before trying to set its attribute
+    const colorThemeElement = document.getElementById("colorTheme");
+    if (colorThemeElement) {
+      colorThemeElement.setAttribute("href", "assets/colors/orange.css");
+    }
 
     // Define the cleanup function to remove the added classes
     return () => {
       document.body.classList.remove("bg-account-pages");
       document.body.classList.remove("py-4");
       document.body.classList.remove("py-sm-0");
-      document.getElementById("colorTheme").setAttribute("href","assets/colors/cyan.css")
-
+      
+      // Check if colorTheme element exists before trying to set its attribute
+      const colorThemeElement = document.getElementById("colorTheme");
+      if (colorThemeElement) {
+        colorThemeElement.setAttribute("href", "assets/colors/cyan.css");
+      }
     };
   }, []);
     return (
@@ -100,10 +108,10 @@ const Login = () => {
         {/* render home button */}
         <AccountHomeButton />
 
-        <Link to="#" id="mode" class="mode-btn text-white" onClick={() => toggleThem()}>
-        <i class="mdi mdi-weather-sunny bx-spin mode-light"></i>
-        <i class="mdi mdi-moon-waning-crescent mode-dark"></i>
-      </Link>
+        <Link to="#" id="mode" className="mode-btn text-white" onClick={() => toggleThem()}>
+          <i className="mdi mdi-weather-sunny bx-spin mode-light"></i>
+          <i className="mdi mdi-moon-waning-crescent mode-dark"></i>
+        </Link>
 
         <section className="vh-100">
           <div className="display-table">

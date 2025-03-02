@@ -34,10 +34,18 @@ class RecruitmentNavbar extends Component {
     this.setState({ isOpenMenu: !this.state.isOpenMenu });
   };
 
-  render() {
-    /********************* Menu Js **********************/
-    function windowScroll() {
-      const navbar = document.getElementById("navbar");
+  componentDidMount() {
+    window.addEventListener("scroll", this.handleScroll);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
+
+  handleScroll = (ev) => {
+    ev.preventDefault();
+    const navbar = document.getElementById("navbar");
+    if (navbar) {
       if (
         document.body.scrollTop >= 50 ||
         document.documentElement.scrollTop >= 50
@@ -47,11 +55,10 @@ class RecruitmentNavbar extends Component {
         navbar.classList.remove("nav-sticky");
       }
     }
+  };
 
-    window.addEventListener("scroll", (ev) => {
-      ev.preventDefault();
-      windowScroll();
-    });
+  render() {
+    /********************* Menu Js **********************/
 
     //Store all Navigationbar Id into TargetID variable(Used for Scrollspy)
     let TargetId = this.state.navItems.map((item) => {

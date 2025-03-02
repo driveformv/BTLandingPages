@@ -36,26 +36,31 @@ class Navbar_Page extends Component {
     this.setState({ isOpenMenu: !this.state.isOpenMenu });
   };
 
-  render() {
-
-      /********************* Menu Js **********************/
-
-    function windowScroll() {
-      const navbar = document.getElementById("navbar");
-      if (
-          document.body.scrollTop >= 50 ||
-          document.documentElement.scrollTop >= 50
-      ) {
-          navbar.classList.add("nav-sticky");
-      } else {
-          navbar.classList.remove("nav-sticky");
-      }
+  componentDidMount() {
+    window.addEventListener("scroll", this.handleScroll);
   }
-  
-  window.addEventListener('scroll', (ev) => {
-      ev.preventDefault();
-      windowScroll();
-  });
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
+
+  handleScroll = (ev) => {
+    ev.preventDefault();
+    const navbar = document.getElementById("navbar");
+    if (navbar) {
+      if (
+        document.body.scrollTop >= 50 ||
+        document.documentElement.scrollTop >= 50
+      ) {
+        navbar.classList.add("nav-sticky");
+      } else {
+        navbar.classList.remove("nav-sticky");
+      }
+    }
+  };
+
+  render() {
+    /********************* Menu Js **********************/
 
     //Store all Navigationbar Id into TargetID variable(Used for Scrollspy)
     let TargetId = this.state.navItems.map((item) => {
