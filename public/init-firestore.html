@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Initialize Firestore Database</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .container {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .log {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 15px;
+      height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      margin-top: 20px;
+    }
+    .log p {
+      margin: 5px 0;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    .info {
+      color: blue;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 10px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Initialize Firestore Database</h1>
+  
+  <div class="container">
+    <p>This page will initialize your Firestore database with sample data for the Border Tire recruitment landing page.</p>
+    <p>Click the button below to start the initialization process:</p>
+    
+    <button id="initButton">Initialize Firestore</button>
+    
+    <div class="log" id="logContainer">
+      <p>Waiting to start initialization...</p>
+    </div>
+  </div>
+
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  
+  <!-- Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Log function to display messages in the log container
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('logContainer');
+      const logEntry = document.createElement('p');
+      logEntry.textContent = message;
+      logEntry.classList.add(type);
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHbPkizviKd_TC7qMmUsLy-KjI-qhrmVo",
+      authDomain: "landing-pages-ca8fc.firebaseapp.com",
+      projectId: "landing-pages-ca8fc",
+      storageBucket: "landing-pages-ca8fc.firebasestorage.app",
+      messagingSenderId: "786684458200",
+      appId: "1:786684458200:web:73e30e20b4a72bc805d3ad"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // Get a reference to Firestore
+    const db = firebase.firestore();
+
+    // Sample job data
+    const initialJobs = [
+      {
+        title: "Production Operator",
+        description: "Operate machinery and equipment in the retread tire production process.",
+        requirements: "1-2 years of manufacturing experience preferred."
+      },
+      {
+        title: "Quality Control Specialist",
+        description: "Ensure all retread tires meet quality standards through inspection and testing.",
+        requirements: "Experience in quality control or inspection required."
+      },
+      {
+        title: "Maintenance Technician",
+        description: "Perform preventative maintenance and repairs on production equipment.",
+        requirements: "Mechanical aptitude and troubleshooting skills required."
+      },
+      {
+        title: "Warehouse Associate",
+        description: "Handle inventory management and shipping/receiving operations.",
+        requirements: "Forklift certification preferred."
+      },
+      {
+        title: "Plant Supervisor",
+        description: "Oversee daily operations and lead a team of production workers.",
+        requirements: "3+ years of supervisory experience in manufacturing."
+      }
+    ];
+
+    // Sample job application data
+    const initialApplications = [
+      {
+        fullName: "John Doe",
+        email: "john.doe@example.com",
+        phone: "555-123-4567",
+        experience: "3-5",
+        preferredRole: "job1", // This will be updated with actual job ID
+        availability: "2weeks",
+        resumeFilename: "john_doe_resume.pdf",
+        applicationDate: new Date(),
+        status: "pending"
+      },
+      {
+        fullName: "Jane Smith",
+        email: "jane.smith@example.com",
+        phone: "555-987-6543",
+        experience: "5+",
+        preferredRole: "job5", // This will be updated with actual job ID
+        availability: "immediate",
+        resumeFilename: "jane_smith_resume.pdf",
+        applicationDate: new Date(),
+        status: "reviewed"
+      }
+    ];
+
+    // Check if a collection exists and has documents
+    async function collectionHasDocuments(collectionName) {
+      try {
+        const querySnapshot = await db.collection(collectionName).limit(1).get();
+        return !querySnapshot.empty;
+      } catch (error) {
+        log(`Error checking if ${collectionName} has documents: ${error.message}`, 'error');
+        return false;
+      }
+    }
+
+    // Initialize Firestore with sample data
+    async function initializeFirestore() {
+      try {
+        log("Checking if collections exist...");
+        
+        // Check if jobs collection has documents
+        const jobsExist = await collectionHasDocuments("jobs");
+        let jobIds = [];
+        
+        if (!jobsExist) {
+          log("Initializing jobs collection...");
+          
+          // Add each job to the jobs collection
+          for (const job of initialJobs) {
+            try {
+              const docRef = await db.collection("jobs").add(job);
+              log(`Added job "${job.title}" with ID: ${docRef.id}`, 'success');
+              jobIds.push(docRef.id);
+            } catch (error) {
+              log(`Error adding job "${job.title}": ${error.message}`, 'error');
+            }
+          }
+          
+          log("Jobs collection initialized successfully!", 'success');
+        } else {
+          log("Jobs collection already exists and has documents.");
+          
+          // Get existing job IDs for reference in applications
+          const jobsSnapshot = await db.collection("jobs").get();
+          jobsSnapshot.forEach(doc => {
+            jobIds.push(doc.id);
+          });
+        }
+        
+        // Check if jobApplications collection has documents
+        const applicationsExist = await collectionHasDocuments("jobApplications");
+        
+        if (!applicationsExist && jobIds.length > 0) {
+          log("Initializing jobApplications collection...");
+          
+          // Update preferredRole with actual job IDs if available
+          if (jobIds.length >= 1) {
+            initialApplications[0].preferredRole = jobIds[0];
+          }
+          
+          if (jobIds.length >= 5) {
+            initialApplications[1].preferredRole = jobIds[4];
+          } else if (jobIds.length >= 2) {
+            initialApplications[1].preferredRole = jobIds[1];
+          }
+          
+          // Add each application to the jobApplications collection
+          for (const application of initialApplications) {
+            try {
+              const docRef = await db.collection("jobApplications").add(application);
+              log(`Added application for "${application.fullName}" with ID: ${docRef.id}`, 'success');
+            } catch (error) {
+              log(`Error adding application for "${application.fullName}": ${error.message}`, 'error');
+            }
+          }
+          
+          log("JobApplications collection initialized successfully!", 'success');
+        } else if (applicationsExist) {
+          log("JobApplications collection already exists and has documents.");
+        } else {
+          log("No job IDs available to create sample applications.", 'error');
+        }
+        
+        log("Firestore initialization complete!", 'success');
+        document.getElementById('initButton').textContent = 'Initialization Complete';
+        document.getElementById('initButton').disabled = true;
+      } catch (error) {
+        log(`Error initializing Firestore: ${error.message}`, 'error');
+      }
+    }
+
+    // Add event listener to the initialize button
+    document.getElementById('initButton').addEventListener('click', function() {
+      this.disabled = true;
+      this.textContent = 'Initializing...';
+      initializeFirestore();
+    });
+  </script>
+</body>
+</html>

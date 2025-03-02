@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTM Parameter Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        .example {
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>UTM Parameter Test Page</h1>
+    
+    <div class="card">
+        <h2>What are UTM Parameters?</h2>
+        <p>UTM parameters are tags added to URLs to track the effectiveness of online marketing campaigns across traffic sources and publishing media.</p>
+        
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+            <tr>
+                <td>utm_source</td>
+                <td>Identifies which site sent the traffic (e.g., google, newsletter)</td>
+                <td>facebook</td>
+            </tr>
+            <tr>
+                <td>utm_medium</td>
+                <td>Identifies what type of link was used (e.g., cpc, email)</td>
+                <td>social</td>
+            </tr>
+            <tr>
+                <td>utm_campaign</td>
+                <td>Identifies a specific product promotion or strategic campaign</td>
+                <td>spring_sale</td>
+            </tr>
+            <tr>
+                <td>utm_term</td>
+                <td>Identifies search terms (optional)</td>
+                <td>hiring+jobs</td>
+            </tr>
+            <tr>
+                <td>utm_content</td>
+                <td>Identifies what specifically was clicked (optional)</td>
+                <td>logo_link</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Generate a Test URL</h2>
+        <p>Use this form to generate a URL with UTM parameters that you can use to test the tracking functionality.</p>
+        
+        <div class="form-group">
+            <label for="utm_source">UTM Source:</label>
+            <input type="text" id="utm_source" placeholder="e.g., facebook, google, newsletter">
+        </div>
+        
+        <div class="form-group">
+            <label for="utm_medium">UTM Medium:</label>
+            <input type="text" id="utm_medium" placeholder="e.g., cpc, social, email">
+        </div>
+        
+        <div class="form-group">
+            <label for="utm_campaign">UTM Campaign:</label>
+            <input type="text" id="utm_campaign" placeholder="e.g., spring_sale, product_launch">
+        </div>
+        
+        <div class="form-group">
+            <label for="utm_term">UTM Term (optional):</label>
+            <input type="text" id="utm_term" placeholder="e.g., running+shoes">
+        </div>
+        
+        <div class="form-group">
+            <label for="utm_content">UTM Content (optional):</label>
+            <input type="text" id="utm_content" placeholder="e.g., logo_link, text_link">
+        </div>
+        
+        <button onclick="generateUrl()">Generate URL</button>
+        
+        <div class="result" id="result">
+            <p>Your URL will appear here...</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Example URLs</h2>
+        
+        <div class="example">
+            <h3>Facebook Ad Campaign</h3>
+            <p><a href="/" id="facebook-example">Loading...</a></p>
+        </div>
+        
+        <div class="example">
+            <h3>Email Newsletter</h3>
+            <p><a href="/" id="email-example">Loading...</a></p>
+        </div>
+        
+        <div class="example">
+            <h3>Google Ads Campaign</h3>
+            <p><a href="/" id="google-example">Loading...</a></p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>How It Works</h2>
+        <p>When you visit the recruitment landing page with UTM parameters:</p>
+        <ol>
+            <li>The application captures the UTM parameters from the URL</li>
+            <li>The parameters are stored in the browser's localStorage</li>
+            <li>When a user submits an application form, the UTM parameters are attached to the submission</li>
+            <li>This allows you to track which marketing campaigns are generating the most applications</li>
+        </ol>
+    </div>
+
+    <script>
+        function generateUrl() {
+            const baseUrl = window.location.origin + '/';
+            const utmSource = document.getElementById('utm_source').value;
+            const utmMedium = document.getElementById('utm_medium').value;
+            const utmCampaign = document.getElementById('utm_campaign').value;
+            const utmTerm = document.getElementById('utm_term').value;
+            const utmContent = document.getElementById('utm_content').value;
+            
+            let url = baseUrl;
+            let params = [];
+            
+            if (utmSource) params.push(`utm_source=${encodeURIComponent(utmSource)}`);
+            if (utmMedium) params.push(`utm_medium=${encodeURIComponent(utmMedium)}`);
+            if (utmCampaign) params.push(`utm_campaign=${encodeURIComponent(utmCampaign)}`);
+            if (utmTerm) params.push(`utm_term=${encodeURIComponent(utmTerm)}`);
+            if (utmContent) params.push(`utm_content=${encodeURIComponent(utmContent)}`);
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <p>Your URL:</p>
+                <p><a href="${url}" target="_blank">${url}</a></p>
+                <p><small>Click the link above to test the UTM parameter tracking.</small></p>
+            `;
+        }
+        
+        // Set up example URLs
+        window.onload = function() {
+            const baseUrl = window.location.origin + '/';
+            
+            const facebookExample = baseUrl + '?utm_source=facebook&utm_medium=social&utm_campaign=job_fair&utm_content=apply_now_button';
+            document.getElementById('facebook-example').href = facebookExample;
+            document.getElementById('facebook-example').textContent = facebookExample;
+            
+            const emailExample = baseUrl + '?utm_source=newsletter&utm_medium=email&utm_campaign=monthly_update&utm_content=job_listing';
+            document.getElementById('email-example').href = emailExample;
+            document.getElementById('email-example').textContent = emailExample;
+            
+            const googleExample = baseUrl + '?utm_source=google&utm_medium=cpc&utm_campaign=brand_keywords&utm_term=tire+technician+jobs';
+            document.getElementById('google-example').href = googleExample;
+            document.getElementById('google-example').textContent = googleExample;
+        };
+    </script>
+</body>
+</html>

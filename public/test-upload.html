@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Firebase Storage Upload</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Firebase Storage Upload</h1>
+    <p>This page tests uploading a file to Firebase Storage in the resumes folder.</p>
+    
+    <div class="form-group">
+        <label for="fileInput">Select a file to upload:</label>
+        <input type="file" id="fileInput">
+    </div>
+    
+    <button id="uploadButton">Upload File</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQPFgyKuSQGGXdcI-3SHR3cOPJnR5qYDI",
+            authDomain: "landing-pages-ca8fc.firebaseapp.com",
+            projectId: "landing-pages-ca8fc",
+            storageBucket: "landing-pages-ca8fc.firebasestorage.app",
+            messagingSenderId: "786684458200",
+            appId: "1:786684458200:web:a9e7c5e1d5b9f9e9f9f9f9"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Get a reference to the storage service
+        const storage = firebase.storage();
+        
+        document.getElementById('uploadButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files.length) {
+                showResult('Please select a file first.', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const fileName = `test_${Date.now()}_${file.name}`;
+            const storageRef = storage.ref();
+            const resumeRef = storageRef.child(`resumes/${fileName}`);
+            
+            // Show uploading message
+            showResult('Uploading file...', 'info');
+            
+            // Upload file
+            const uploadTask = resumeRef.put(file);
+            
+            // Register three observers:
+            // 1. 'state_changed' observer, called any time the state changes
+            // 2. Error observer, called on failure
+            // 3. Completion observer, called on successful completion
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    // Observe state change events such as progress, pause, and resume
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    showResult(`Upload is ${progress.toFixed(2)}% done`, 'info');
+                }, 
+                (error) => {
+                    // Handle unsuccessful uploads
+                    showResult(`Error: ${error.message}`, 'error');
+                }, 
+                () => {
+                    // Handle successful uploads on complete
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        showResult(`File uploaded successfully! Download URL: ${downloadURL}`, 'success');
+                    });
+                }
+            );
+        });
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+            
+            // Reset classes
+            resultDiv.classList.remove('success', 'error', 'info');
+            
+            // Add appropriate class
+            if (type) {
+                resultDiv.classList.add(type);
+            }
+        }
+    </script>
+</body>
+</html>

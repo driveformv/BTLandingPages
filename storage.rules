@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // By default, deny all read and write access
+      allow read, write: if false;
+    }
+    
+    // Allow public access to the resumes folder
+    match /resumes/{fileName} {
+      // Allow anyone to upload and read resumes
+      allow read, write: if true;
+    }
+  }
+}

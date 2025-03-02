@@ -1,0 +1,23 @@
+/* Custom styles for the login and password reset pages */
+
+/* Override the default blue/purple gradient background with orange */
+.bg-account-pages {
+  background: linear-gradient(to right, #f28123, #d8721e) !important;
+  opacity: 0.9;
+}
+
+/* Additional styling for the account card */
+.account-card {
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text is readable on the orange background */
+.text-white {
+  color: #ffffff !important;
+}
+
+/* Style for the mode button */
+.mode-btn {
+  background-color: rgba(0, 0, 0, 0.2);
+}

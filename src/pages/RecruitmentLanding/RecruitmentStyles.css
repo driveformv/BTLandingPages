@@ -1,0 +1,77 @@
+/* Custom styles for the recruitment landing page */
+
+/* Logo styling */
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  max-width: 180px;
+}
+
+/* Adjust logo size for sticky navbar */
+.nav-sticky .navbar-logo {
+  height: 35px;
+}
+
+/* White button with orange text */
+.btn-orange, 
+a.btn-orange, 
+button.btn-orange,
+.btn.btn-orange {
+  background-color: #ffffff !important;
+  border-color: #f09105 !important;
+  color: #f09105 !important;
+}
+
+.btn-orange:hover, 
+.btn-orange:focus, 
+.btn-orange:active,
+.btn-orange.active,
+a.btn-orange:hover,
+a.btn-orange:focus,
+a.btn-orange:active,
+a.btn-orange.active {
+  background-color: #ffffff !important;
+  border-color: #dc8505 !important;
+  color: #dc8505 !important;
+}
+
+/* Apply orange text to all white buttons */
+button.btn-orange,
+a.btn-orange,
+.btn.btn-orange {
+  color: #f09105 !important;
+  background-color: #ffffff !important;
+}
+
+/* Orange section title border */
+.orange-section-title-border {
+  width: 50px;
+  height: 2px;
+  margin-right: auto;
+  margin-left: auto;
+  background-color: #f09105 !important;
+}
+
+/* Override any teal colors */
+.section-title-border {
+  background-color: #f09105 !important;
+}
+
+/* Override active nav link color */
+#mySidenav .nav-link:hover, 
+#mySidenav .active .nav-link {
+  color: #f09105 !important;
+}
+
+/* Override any other teal colors */
+.bg-primary {
+  background-color: #f09105 !important;
+}
+
+.text-primary {
+  color: #f09105 !important;
+}
+
+.border-primary {
+  border-color: #f09105 !important;
+}
