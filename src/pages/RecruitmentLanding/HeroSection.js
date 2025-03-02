@@ -22,19 +22,20 @@ class HeroSection extends Component {
                   We're looking for talented individuals to join our growing team.
                 </p>
                 <div className="mt-4">
-                  <a
-                    href="#application"
+                  <Link
+                    to="#application"
                     className="btn btn-orange mt-2 mr-2"
                     style={{ backgroundColor: "#ffffff", color: "#f09105" }}
                   >
                     Apply Now
-                  </a>
-                  <a
-                    href="#jobs"
+                  </Link>
+                  <Button
+                    tag={Link}
+                    to="#jobs"
                     className="btn btn-outline-light mt-2"
                   >
                     View Open Positions
-                  </a>
+                  </Button>
                 </div>
               </Col>
             </Row>
