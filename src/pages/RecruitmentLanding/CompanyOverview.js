@@ -30,7 +30,7 @@ class CompanyOverview extends Component {
                 <div className="mt-4">
                   <img
                     src="/assets/images/img-1.jpg"
-                    alt="company image"
+                    alt="Border Tire facility"
                     className="img-fluid rounded"
                   />
                 </div>

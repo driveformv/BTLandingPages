@@ -11,7 +11,7 @@ import { getDocuments } from "./firestoreService";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const App = () => {
-  const [firestoreInitialized, setFirestoreInitialized] = useState(false);
+  const [, setFirestoreInitialized] = useState(false);
 
   useEffect(() => {
     initializeFirestoreData();

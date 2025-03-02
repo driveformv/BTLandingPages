@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { getApplication, updateApplicationStatus, getAllJobListings } from '../../firestoreAdmin';
 
 const ApplicationDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [application, setApplication] = useState(null);
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,11 +17,7 @@ const ApplicationDetail = () => {
     { value: 'rejected', label: 'Rejected', icon: 'mdi-close-circle-outline', color: 'danger' }
   ]);
 
-  useEffect(() => {
-    fetchApplicationData();
-  }, [id]);
-
-  const fetchApplicationData = async () => {
+  const fetchApplicationData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -55,7 +50,11 @@ const ApplicationDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchApplicationData();
+  }, [fetchApplicationData]);
 
   const handleStatusUpdate = async (newStatus) => {
     try {

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Row, Col } from 'reactstrap';
 import { getAllApplications, getApplicationsForJob, getAllJobListings } from '../../firestoreAdmin';
 
 const ApplicationsManagement = () => {
@@ -16,13 +15,8 @@ const ApplicationsManagement = () => {
   const [sortDirection, setSortDirection] = useState('desc');
   const [downloadLoading, setDownloadLoading] = useState(false);
 
-  // Fetch applications and jobs on component mount
-  useEffect(() => {
-    fetchApplicationsAndJobs();
-  }, []);
-
   // Fetch applications and jobs from Firestore
-  const fetchApplicationsAndJobs = async () => {
+  const fetchApplicationsAndJobs = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -51,7 +45,12 @@ const ApplicationsManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterJob, filterStatus]);
+
+  // Fetch applications and jobs on component mount
+  useEffect(() => {
+    fetchApplicationsAndJobs();
+  }, [fetchApplicationsAndJobs]);
 
   // Apply filters
   const applyFilters = () => {
