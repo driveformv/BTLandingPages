@@ -1,8 +1,14 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { Container, Row, Col, Button } from "reactstrap";
 
 class HeroSection extends Component {
+  scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   render() {
     return (
       <React.Fragment>
@@ -22,16 +28,15 @@ class HeroSection extends Component {
                   We're looking for talented individuals to join our growing team.
                 </p>
                 <div className="mt-4">
-                  <Link
-                    to="#application"
+                  <Button
+                    onClick={() => this.scrollToSection("application")}
                     className="btn btn-orange mt-2 mr-2"
                     style={{ backgroundColor: "#ffffff", color: "#f09105" }}
                   >
                     Apply Now
-                  </Link>
+                  </Button>
                   <Button
-                    tag={Link}
-                    to="#jobs"
+                    onClick={() => this.scrollToSection("jobs")}
                     className="btn btn-outline-light mt-2"
                   >
                     View Open Positions

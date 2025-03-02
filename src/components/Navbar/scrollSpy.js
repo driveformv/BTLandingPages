@@ -68,93 +68,87 @@ class ScrollspyNav extends Component {
         });
     }
 
-    document
-      .querySelector("div[data-nav='list']")
-      .querySelectorAll("a")
-      .forEach((navLink) => {
+    const navListElement = document.querySelector("div[data-nav='list']");
+    if (navListElement) {
+      navListElement.querySelectorAll("a").forEach((navLink) => {
         navLink.addEventListener("click", (event) => {
           event.preventDefault();
           let sectionID = this.getNavToSectionID(navLink.getAttribute("href"));
 
           if (sectionID) {
-            let scrollTargetPosition =
-              document.getElementById(sectionID).offsetTop -
-              (this.headerBackground
-                ? document.querySelector("div[data-nav='list']").scrollHeight
-                : 0);
-            this.scrollTo(
-              window.pageYOffset,
-              scrollTargetPosition,
-              this.scrollDuration
-            );
+            const sectionElement = document.getElementById(sectionID);
+            if (sectionElement) {
+              let scrollTargetPosition =
+                sectionElement.offsetTop -
+                (this.headerBackground && navListElement
+                  ? navListElement.scrollHeight
+                  : 0);
+              this.scrollTo(
+                window.pageYOffset,
+                scrollTargetPosition,
+                this.scrollDuration
+              );
+            }
           } else {
             this.scrollTo(window.pageYOffset, 0, this.scrollDuration);
           }
         });
       });
+    }
 
-      window.addEventListener("scroll", () => {
-        this.scrollTargetIds.forEach((sectionID, index) => {
-          let scrollSectionOffsetTop =
-            document.getElementById(sectionID).offsetTop -
-            (this.headerBackground
-              ? document.querySelector("div[data-nav='list']").scrollHeight
-              : 0);
-      
-          if (
-            window.pageYOffset >= scrollSectionOffsetTop &&
-            window.pageYOffset <
-              scrollSectionOffsetTop +
-                document.getElementById(sectionID).scrollHeight
-          ) {
-            this.getNavLinkElement(sectionID).classList.add(this.activeNavClass);
-            this.getNavLinkElement(sectionID).parentNode.classList.add(
-              this.activeNavClass
-            );
-            this.clearOtherNavLinkActiveStyle(sectionID);
-          } else {
-            this.getNavLinkElement(sectionID).classList.remove(
-              this.activeNavClass
-            );
-            this.getNavLinkElement(sectionID).parentNode.classList.remove(
-              this.activeNavClass
-            );
-          }
-      
-          if (
-            index === this.scrollTargetIds.length - 1 &&
-            window.innerHeight + window.pageYOffset >= document.body.scrollHeight
-          ) {
-            this.getNavLinkElement(sectionID).classList.add(this.activeNavClass);
-            this.getNavLinkElement(sectionID).parentNode.classList.add(
-              this.activeNavClass
-            );
-            this.clearOtherNavLinkActiveStyle(sectionID);
-          }
-        });
+    window.addEventListener("scroll", () => {
+      const navListElement = document.querySelector("div[data-nav='list']");
+      if (!navListElement) return;
+
+      this.scrollTargetIds.forEach((sectionID, index) => {
+        const sectionElement = document.getElementById(sectionID);
+        const navLinkElement = this.getNavLinkElement(sectionID);
+        
+        // Skip if section element or nav link doesn't exist
+        if (!sectionElement || !navLinkElement) return;
+        
+        let scrollSectionOffsetTop =
+          sectionElement.offsetTop -
+          (this.headerBackground ? navListElement.scrollHeight : 0);
+    
+        if (
+          window.pageYOffset >= scrollSectionOffsetTop &&
+          window.pageYOffset <
+            scrollSectionOffsetTop + sectionElement.scrollHeight
+        ) {
+          navLinkElement.classList.add(this.activeNavClass);
+          navLinkElement.parentNode.classList.add(this.activeNavClass);
+          this.clearOtherNavLinkActiveStyle(sectionID);
+        } else {
+          navLinkElement.classList.remove(this.activeNavClass);
+          navLinkElement.parentNode.classList.remove(this.activeNavClass);
+        }
+    
+        if (
+          index === this.scrollTargetIds.length - 1 &&
+          window.innerHeight + window.pageYOffset >= document.body.scrollHeight
+        ) {
+          navLinkElement.classList.add(this.activeNavClass);
+          navLinkElement.parentNode.classList.add(this.activeNavClass);
+          this.clearOtherNavLinkActiveStyle(sectionID);
+        }
       });
-      
+    });
   }
 
-  // clearOtherNavLinkActiveStyle(excludeSectionID) {
-  //   this.scrollTargetIds.map((sectionID) => {
-  //     if (sectionID !== excludeSectionID) {
-  //       this.getNavLinkElement(sectionID).classList.remove(this.activeNavClass);
-  //       this.getNavLinkElement(sectionID).parentNode.classList.remove(
-  //         this.activeNavClass
-  //       );
-  //     }
-  //   });
-  // }
-
   clearOtherNavLinkActiveStyle(excludeSectionID) {
-    this.scrollTargetIds.filter(sectionID => sectionID !== excludeSectionID).forEach(sectionID => {
-      this.getNavLinkElement(sectionID).classList.remove(this.activeNavClass);
-      this.getNavLinkElement(sectionID).parentNode.classList.remove(
-        this.activeNavClass
-      );
-    });
-}
+    this.scrollTargetIds
+      .filter(sectionID => sectionID !== excludeSectionID)
+      .forEach(sectionID => {
+        const navLinkElement = this.getNavLinkElement(sectionID);
+        if (navLinkElement) {
+          navLinkElement.classList.remove(this.activeNavClass);
+          if (navLinkElement.parentNode) {
+            navLinkElement.parentNode.classList.remove(this.activeNavClass);
+          }
+        }
+      });
+  }
 
   render() {
     return (
