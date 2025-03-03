@@ -5,6 +5,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { addDocument, updateDocument, getDocuments } from "../../firestoreService";
 import { uploadResume } from "../../storageService";
+import { analytics } from "../../firebase";
+import { logEvent } from "firebase/analytics";
 // Email sending is now handled by Firebase Cloud Functions
 
 // File size validation (5MB max)
@@ -159,6 +161,14 @@ class ApplicationForm extends Component {
           this.setState({ isUploading: false });
         }
       }
+      
+      // Track the application submission event in Firebase Analytics
+      logEvent(analytics, 'application_submitted', {
+        job_role: values.preferredRole,
+        experience_level: values.experience,
+        utm_source: utmParams.utm_source || 'direct',
+        application_id: applicationId
+      });
       
       // Reset form and show success message
       resetForm();

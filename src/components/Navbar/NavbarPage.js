@@ -10,6 +10,8 @@ import {
   Button,
 } from "reactstrap";
 import ScrollspyNav from "./scrollSpy";
+import { analytics } from "../../firebase";
+import { logEvent } from "firebase/analytics";
 
 //Import Stickey Header
 import StickyHeader from "react-sticky-header";
@@ -38,6 +40,13 @@ class Navbar_Page extends Component {
 
   componentDidMount() {
     window.addEventListener("scroll", this.handleScroll);
+    
+    // Log page view event when component mounts
+    logEvent(analytics, 'page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    });
   }
 
   componentWillUnmount() {
@@ -103,7 +112,14 @@ class Navbar_Page extends Component {
                           key={key}
                           className={item.navheading === "Home" ? "active" : ""}
                         >
-                          <NavLink href={"#" + item.idnm}>
+                          <NavLink 
+                            href={"#" + item.idnm}
+                            onClick={() => {
+                              logEvent(analytics, 'page_section_view', {
+                                section_name: item.navheading
+                              });
+                            }}
+                          >
                             {" "}
                             {item.navheading}
                           </NavLink>
@@ -118,6 +134,12 @@ class Navbar_Page extends Component {
                           type="button"
                           color="primary"
                           className=" navbar-btn btn-rounded waves-effect waves-light"
+                          onClick={() => {
+                            logEvent(analytics, 'button_click', {
+                              button_name: 'try_it_free',
+                              button_location: 'navbar'
+                            });
+                          }}
                         >
                           Try it Free
                         </Button>

@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // Using environment variables for security, with fallback to hardcoded values for production
@@ -37,4 +38,7 @@ const storage = getStorage(app);
 // Initialize Firebase Authentication
 const auth = getAuth(app);
 
-export { db, storage, auth };
+// Initialize Firebase Analytics
+const analytics = getAnalytics(app);
+
+export { db, storage, auth, analytics };

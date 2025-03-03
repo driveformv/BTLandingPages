@@ -4,18 +4,32 @@ import routes from "./routes";
 import withRouter from "./components/withRouter";
 import {
   Route,
-  Routes
+  Routes,
+  useLocation
 } from "react-router-dom";
 import { initializeFirestore } from "./initFirestore";
 import { getDocuments } from "./firestoreService";
 import { AuthProvider } from "./contexts/AuthContext";
+import { analytics } from "./firebase";
+import { logEvent } from "firebase/analytics";
 
 const App = () => {
   const [, setFirestoreInitialized] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     initializeFirestoreData();
   }, []);
+
+  // Track page views when location changes
+  useEffect(() => {
+    // Log page view event
+    logEvent(analytics, 'page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: location.pathname + location.search
+    });
+  }, [location]);
 
   const initializeFirestoreData = async () => {
     try {
