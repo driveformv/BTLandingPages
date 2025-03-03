@@ -29,8 +29,8 @@ class CompanyOverview extends Component {
               <Col lg={6}>
                 <div className="mt-4">
                   <img
-                    src="/assets/images/img-1.jpg"
-                    alt="Border Tire facility"
+                    src="/assets/images/border-tire-employee.jpg"
+                    alt="Border Tire employee working on a tire"
                     className="img-fluid rounded"
                   />
                 </div>
