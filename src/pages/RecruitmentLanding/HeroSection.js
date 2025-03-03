@@ -12,7 +12,7 @@ class HeroSection extends Component {
   render() {
     return (
       <React.Fragment>
-        <section className="section bg-home home-half" id="home" data-image-src="images/bg-home.jpg"> 
+        <section className="section bg-home home-half" id="home" data-image-src="images/bg-home.jpg" style={{width: '2000px', height: '1500px'}}>
           <div className="bg-overlay" style={{ background: "linear-gradient(to right, #f09105, #dc8505)", opacity: 0.95 }}></div>
           <Container>
             <Row>
