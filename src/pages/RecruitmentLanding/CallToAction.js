@@ -18,7 +18,7 @@ class CallToAction extends Component {
                   href="tel:1-844-717-TIRE"
                   className="btn-lg text-white"
                 >
-                  Contact Border Tire Michelin MRT Retread Plant
+                  Call a Recruiter Now
                 </Button>
               </Col>
             </Row>
