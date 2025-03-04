@@ -226,8 +226,8 @@ class ApplicationForm extends Component {
         <section className="section" id="application">
           <Container>
             <RecruitmentSectionTitle
-              title="Apply Now"
-              description="Join our team at the new Redlands plant. Fill out the application form below to get started."
+              title="How to Apply – Your New Career Starts Here 📢"
+              description="Ready to take the next step? Applying is easy and quick. It only takes a few minutes to potentially change your life!"
             />
 
             <Row className="justify-content-center">
@@ -236,10 +236,10 @@ class ApplicationForm extends Component {
                   <Alert color="success" className="mt-4">
                     <h4 className="alert-heading">Application Submitted!</h4>
                     <p>
-                      Thank you for your interest in joining Border Tire. We have received your application and will review it shortly.
+                      Thank you for your interest in joining the Border Tire family! We have received your application and will review it shortly.
                     </p>
                     <p>
-                      You will receive a confirmation email at the address you provided. If you have any questions, please contact our HR department.
+                      You will receive a confirmation email at the address you provided. We're hiring for 30 immediate openings, so we review applications daily!
                     </p>
                     <hr />
                     <p className="mb-0">

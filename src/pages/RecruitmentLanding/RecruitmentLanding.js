@@ -7,6 +7,7 @@ import JobListings from "./JobListings";
 import EmployeeBenefits from "./EmployeeBenefits";
 import ApplicationForm from "./ApplicationForm";
 import RecruitmentFooter from './RecruitmentFooter';
+import CallToAction from './CallToAction';
 
 class RecruitmentLanding extends Component {
     constructor(props) {
@@ -36,6 +37,9 @@ class RecruitmentLanding extends Component {
 
                 {/* Application Form */}
                 <ApplicationForm />
+
+                {/* Call to Action */}
+                <CallToAction />
 
                 {/* Recruitment Footer */}
                 <RecruitmentFooter />

@@ -9,20 +9,20 @@ class CompanyOverview extends Component {
         <section className="section bg-light" id="company">
           <Container>
             <RecruitmentSectionTitle
-              title="About Border Tire"
-              description="We're a leading tire company expanding our operations with a new state-of-the-art retread tire plant in Redlands, California."
+              title="Who We Are"
+              description="Border Tire MRT is a leader in tire retread services, proudly using Michelin's state-of-the-art Retread Technologies."
             />
             <Row className="mt-4">
               <Col lg={6}>
                 <div className="mt-4">
                   <p className="text-muted">
-                    Border Tire has been a trusted name in the tire industry for years, providing quality products and exceptional service to our customers. Our new Redlands plant represents a significant expansion of our operations and will serve as a key hub for our retread tire production.
+                    At Border Tire MRT, we give new life to tires using Michelin's state-of-the-art Retread Technologies. We keep trucks and heavy equipment rolling safely while promoting sustainability by recycling tires.
                   </p>
                   <p className="text-muted">
-                    This state-of-the-art facility will utilize the latest technology and processes to deliver high-quality retread tires while maintaining our commitment to sustainability and environmental responsibility.
+                    Our team is like a family – we work hard, we laugh often, and we take pride in doing the job right. When you join Border Tire, you become part of a company that values quality, safety, and people.
                   </p>
                   <p className="text-muted">
-                    We're looking for talented individuals who share our values of quality, integrity, and customer service to join our team and help us grow our operations in Redlands.
+                    We're looking for motivated, reliable individuals who are ready to grow with us. Whether you're just starting your career, switching industries, or looking for a fresh start, Border Tire MRT welcomes you.
                   </p>
                 </div>
               </Col>

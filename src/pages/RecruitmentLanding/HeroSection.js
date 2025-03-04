@@ -21,11 +21,11 @@ class HeroSection extends Component {
                 className="text-white text-center"
               >
                 <h1 className="home-title">
-                  Join Our Team in Redlands!
+                  Join the Border Tire Family – Drive Your Career Forward 🚀
                 </h1>
                 <p className="pt-3 home-desc mx-auto">
-                  Border Tire is expanding with a new retread tire plant in Redlands, CA. 
-                  We're looking for talented individuals to join our growing team.
+                  Welcome to Border Tire MRT (Michelin Retread Technologies) – where we retread tires and build futures. 
+                  We're hiring at least 30 retread technicians. No experience? No problem!
                 </p>
                 <div className="mt-4">
                   <Button

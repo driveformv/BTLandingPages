@@ -9,8 +9,8 @@ class EmployeeBenefits extends Component {
         <section className="section bg-light" id="benefits">
           <Container>
             <RecruitmentSectionTitle
-              title="Why Join Border Tire?"
-              description="We offer competitive compensation and a comprehensive benefits package to support our team members."
+              title="Why Work at Border Tire MRT?"
+              description="Join a company that values quality, safety, and people. We offer more than just a job - we offer a career with growth opportunities."
             />
 
             <Row className="mt-4">
@@ -21,11 +21,11 @@ class EmployeeBenefits extends Component {
                     <Col md={6}>
                       <div className="d-flex mb-3">
                         <div className="icons-md rounded-circle bg-orange text-white mr-4">
-                          <i className="mdi mdi-medical-bag"></i>
+                          <i className="mdi mdi-school"></i>
                         </div>
                         <div>
-                          <h5>Health Insurance</h5>
-                          <p className="text-muted mb-0">Comprehensive medical, dental, and vision coverage</p>
+                          <h5>Comprehensive Training</h5>
+                          <p className="text-muted mb-0">Our Michelin-certified training program teaches you everything you need to know – no prior tire experience needed.</p>
                         </div>
                       </div>
                     </Col>
@@ -35,30 +35,30 @@ class EmployeeBenefits extends Component {
                           <i className="mdi mdi-cash-multiple"></i>
                         </div>
                         <div>
-                          <h5>401(k) Plan</h5>
-                          <p className="text-muted mb-0">Retirement savings with company match</p>
+                          <h5>Competitive Pay & Benefits</h5>
+                          <p className="text-muted mb-0">Health insurance, paid time off, and retirement plans to build a secure future.</p>
                         </div>
                       </div>
                     </Col>
                     <Col md={6}>
                       <div className="d-flex mb-3">
                         <div className="icons-md rounded-circle bg-orange text-white mr-4">
-                          <i className="mdi mdi-beach"></i>
+                          <i className="mdi mdi-chart-line"></i>
                         </div>
                         <div>
-                          <h5>Paid Time Off</h5>
-                          <p className="text-muted mb-0">Vacation, holidays, and sick leave</p>
+                          <h5>Career Growth</h5>
+                          <p className="text-muted mb-0">Many of our supervisors and managers were once entry-level technicians. We love to promote from within.</p>
                         </div>
                       </div>
                     </Col>
                     <Col md={6}>
                       <div className="d-flex mb-3">
                         <div className="icons-md rounded-circle bg-orange text-white mr-4">
-                          <i className="mdi mdi-school"></i>
+                          <i className="mdi mdi-account-group"></i>
                         </div>
                         <div>
-                          <h5>Training & Development</h5>
-                          <p className="text-muted mb-0">Opportunities for growth and advancement</p>
+                          <h5>Fun, Professional Culture</h5>
+                          <p className="text-muted mb-0">Our team is tight-knit and supportive with team BBQs, celebration lunches, and on-the-job camaraderie.</p>
                         </div>
                       </div>
                     </Col>
