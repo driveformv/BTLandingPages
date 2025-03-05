@@ -75,3 +75,25 @@ a.btn-orange,
 .border-primary {
   border-color: #f09105 !important;
 }
+
+/* Hiring Event Box Styling */
+.hiring-event-box {
+  background-color: #ffffff;
+  border: 2px solid #f09105;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hiring-event-box:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.hiring-event-box h4 {
+  font-weight: 600;
+}
+
+.hiring-event-box p {
+  color: #333333;
+}
