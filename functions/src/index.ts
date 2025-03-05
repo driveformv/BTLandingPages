@@ -2,6 +2,8 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { Resend } from 'resend';
 import { createEmailSettings } from './createEmailSettings';
+import axios from 'axios';
+import * as xml2js from 'xml2js';
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -286,6 +288,481 @@ async function sendRecruiterNotificationEmail(
     throw error;
   }
 }
+
+/**
+ * Cloud Function to update jobs from XML feed
+ * Fetches job data from the XML feed and updates the Firestore database
+ */
+export const updateJobsFromXmlFeed = functions.pubsub
+  .schedule('0 0 * * *') // Run at midnight every day (cron syntax)
+  .timeZone('America/Denver') // Mountain Time
+  .onRun(async (context) => {
+    try {
+      console.log('Starting job update from XML feed');
+      
+      // Fetch the XML feed
+      const xmlFeedUrl = 'https://mvtholdings.jobs/feeds/indeed.xml';
+      console.log(`Fetching XML feed from: ${xmlFeedUrl}`);
+      
+      const response = await axios.get(xmlFeedUrl);
+      const xmlData = response.data;
+      
+      // Parse the XML data
+      const parser = new xml2js.Parser({ explicitArray: false });
+      const result = await parser.parseStringPromise(xmlData);
+      
+      // Get the jobs from the parsed XML
+      // Note: Adjust the path based on the actual XML structure
+      const xmlJobs = result.source?.job || [];
+      const jobs = Array.isArray(xmlJobs) ? xmlJobs : [xmlJobs];
+      
+      console.log(`Found ${jobs.length} jobs in the XML feed`);
+      
+      // Get existing jobs from Firestore
+      const jobsCollection = admin.firestore().collection('jobs');
+      const existingJobsSnapshot = await jobsCollection.get();
+      const existingJobs = existingJobsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Array<{
+        id: string;
+        title?: string;
+        description?: string;
+        requirements?: string;
+        isActive?: boolean;
+        location?: string;
+        company?: string;
+        jobType?: string;
+        salary?: string;
+        externalId?: string;
+        lastUpdated?: any;
+      }>;
+      
+      console.log(`Found ${existingJobs.length} existing jobs in Firestore`);
+      
+      // Track which jobs were updated
+      const updatedJobIds = new Set<string>();
+      
+      // Get all Border Tire jobs from the XML feed
+      const borderTireJobs = jobs.filter(job => job.company === 'Border Tire');
+      console.log(`Found ${borderTireJobs.length} Border Tire jobs in the XML feed`);
+      
+      // Process each Border Tire job from the XML feed
+      for (const xmlJob of borderTireJobs) {
+        try {
+          // Clean up HTML formatting in description
+          let cleanDescription = xmlJob.description || '';
+          
+          // Fix common formatting issues
+          cleanDescription = cleanDescription
+            // Fix spacing issues
+            .replace(/\s+/g, ' ')
+            // Fix spacing after commas
+            .replace(/,\s*/g, ', ')
+            // Fix spacing after periods
+            .replace(/\.\s*/g, '. ')
+            // Fix spacing after colons
+            .replace(/:\s*/g, ': ')
+            // Fix spacing after semicolons
+            .replace(/;\s*/g, '; ')
+            // Fix spacing after question marks
+            .replace(/\?\s*/g, '? ')
+            // Fix spacing after exclamation marks
+            .replace(/!\s*/g, '! ')
+            // Fix spacing around parentheses
+            .replace(/\(\s*/g, '(').replace(/\s*\)/g, ')')
+            // Fix spacing around brackets
+            .replace(/\[\s*/g, '[').replace(/\s*\]/g, ']')
+            // Fix spacing around braces
+            .replace(/\{\s*/g, '{').replace(/\s*\}/g, '}')
+            // Fix spacing around quotes
+            .replace(/"\s*/g, '"').replace(/\s*"/g, '"')
+            // Fix spacing around apostrophes
+            .replace(/'\s*/g, "'").replace(/\s*'/g, "'")
+            // Fix spacing around hyphens
+            .replace(/\s*-\s*/g, '-')
+            // Fix spacing around en dashes
+            .replace(/\s*–\s*/g, ' – ')
+            // Fix spacing around em dashes
+            .replace(/\s*—\s*/g, ' — ')
+            // Fix spacing around dollar signs
+            .replace(/\$\s*/g, '$')
+            // Fix spacing around percentage signs
+            .replace(/\s*%/g, '%')
+            // Fix spacing around plus signs
+            .replace(/\s*\+\s*/g, '+')
+            // Fix spacing around equals signs
+            .replace(/\s*=\s*/g, '=');
+          
+          // Extract job data from XML
+          const jobData = {
+            title: xmlJob.title || '',
+            description: cleanDescription,
+            requirements: xmlJob.requirements || '',
+            isActive: true,
+            location: `${xmlJob.city || ''}, ${xmlJob.state || ''}`.trim(),
+            company: 'Border Tire',
+            jobType: xmlJob.jobtype || '',
+            salary: xmlJob.salary || '',
+            externalId: xmlJob.referencenumber || xmlJob.id || '',
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+          };
+          
+          // Look for an existing job with the same external ID or title
+          let existingJob = existingJobs.find(job => 
+            (job.externalId && job.externalId === jobData.externalId) || 
+            (job.title === jobData.title)
+          );
+          
+          if (existingJob) {
+            // Update existing job
+            console.log(`Updating existing job: ${jobData.title}`);
+            await jobsCollection.doc(existingJob.id).update(jobData);
+            updatedJobIds.add(existingJob.id);
+          } else {
+            // Add new job
+            console.log(`Adding new job: ${jobData.title}`);
+            const newJobRef = await jobsCollection.add(jobData);
+            updatedJobIds.add(newJobRef.id);
+          }
+        } catch (jobError) {
+          console.error(`Error processing job ${xmlJob.title || 'unknown'}:`, jobError);
+          // Continue with the next job
+        }
+      }
+      
+      // Mark jobs not in the feed as inactive
+      for (const existingJob of existingJobs) {
+        if (!updatedJobIds.has(existingJob.id)) {
+          console.log(`Marking job as inactive: ${existingJob.title}`);
+          await jobsCollection.doc(existingJob.id).update({ 
+            isActive: false,
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }
+      
+      console.log('Job update from XML feed completed successfully');
+      return null;
+    } catch (error) {
+      console.error('Error updating jobs from XML feed:', error);
+      return null;
+    }
+  });
+
+// HTTP endpoint for marking all Border Tire jobs as active
+export const markBorderTireJobsActive = functions.https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+  try {
+    console.log('Manual request to mark Border Tire jobs as active');
+    
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+      res.status(405).send('Method Not Allowed');
+      return;
+    }
+    
+    // Get all jobs from Firestore
+    const jobsCollection = admin.firestore().collection('jobs');
+    const borderTireJobsSnapshot = await jobsCollection.where('company', '==', 'Border Tire').get();
+    
+    if (borderTireJobsSnapshot.empty) {
+      console.log('No Border Tire jobs found in Firestore.');
+      res.status(404).send({ error: 'No Border Tire jobs found in Firestore.' });
+      return;
+    }
+    
+    console.log(`Found ${borderTireJobsSnapshot.size} Border Tire jobs in Firestore.`);
+    
+    // Update each Border Tire job to be active
+    const updatePromises: Promise<any>[] = [];
+    const updatedJobs: string[] = [];
+    
+    borderTireJobsSnapshot.forEach(doc => {
+      const jobData = doc.data();
+      console.log(`Job ID: ${doc.id}`);
+      console.log(`Title: ${jobData.title}`);
+      console.log(`Location: ${jobData.location || 'N/A'}`);
+      console.log(`Current isActive status: ${jobData.isActive}`);
+      
+      // Only update if not already active
+      if (jobData.isActive !== true) {
+        console.log(`Marking job as active: ${jobData.title}`);
+        updatePromises.push(
+          jobsCollection.doc(doc.id).update({ 
+            isActive: true,
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+          })
+        );
+        updatedJobs.push(jobData.title);
+      } else {
+        console.log(`Job already active: ${jobData.title}`);
+      }
+    });
+    
+    // Wait for all updates to complete
+    if (updatePromises.length > 0) {
+      await Promise.all(updatePromises);
+      console.log(`Successfully marked ${updatePromises.length} Border Tire jobs as active.`);
+      res.status(200).send({ 
+        success: true, 
+        message: `Successfully marked ${updatePromises.length} Border Tire jobs as active.`,
+        updatedJobs
+      });
+    } else {
+      console.log('All Border Tire jobs are already active.');
+      res.status(200).send({ 
+        success: true, 
+        message: 'All Border Tire jobs are already active.'
+      });
+    }
+  } catch (error: any) {
+    console.error('Error marking Border Tire jobs as active:', error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Import CORS package
+import cors from 'cors';
+
+// Initialize CORS middleware with options
+const corsHandler = cors({ origin: true });
+
+// HTTP endpoint for manually triggering the job update function
+export const manualUpdateJobs = functions.https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+  // Enable CORS using the cors middleware
+  return corsHandler(req, res, async () => {
+    try {
+      console.log('Manual job update triggered');
+      
+      // Only allow POST requests
+      if (req.method !== 'POST') {
+        res.status(405).send('Method Not Allowed');
+        return;
+      }
+    
+    // Fetch the XML feed
+    const xmlFeedUrl = 'https://mvtholdings.jobs/feeds/indeed.xml';
+    console.log(`Fetching XML feed from: ${xmlFeedUrl}`);
+    
+    const response = await axios.get(xmlFeedUrl);
+    const xmlData = response.data;
+    
+    // Parse the XML data
+    const parser = new xml2js.Parser({ explicitArray: false });
+    const result = await parser.parseStringPromise(xmlData);
+    
+    // Get the jobs from the parsed XML
+    const xmlJobs = result.source?.job || [];
+    const jobs = Array.isArray(xmlJobs) ? xmlJobs : [xmlJobs];
+    
+    console.log(`Found ${jobs.length} jobs in the XML feed`);
+    
+    // Get existing jobs from Firestore
+    const jobsCollection = admin.firestore().collection('jobs');
+    const existingJobsSnapshot = await jobsCollection.get();
+    const existingJobs = existingJobsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Array<{
+      id: string;
+      title?: string;
+      description?: string;
+      requirements?: string;
+      isActive?: boolean;
+      location?: string;
+      company?: string;
+      jobType?: string;
+      salary?: string;
+      externalId?: string;
+      lastUpdated?: any;
+    }>;
+    
+    console.log(`Found ${existingJobs.length} existing jobs in Firestore`);
+    
+    // Track which jobs were updated
+    const updatedJobIds = new Set<string>();
+    const jobsAdded = [];
+    const jobsUpdated = [];
+    const jobsInactivated = [];
+    
+    // Get all Border Tire jobs from the XML feed
+    const borderTireJobs = jobs.filter(job => job.company === 'Border Tire');
+    console.log(`Found ${borderTireJobs.length} Border Tire jobs in the XML feed`);
+    
+    // Process each Border Tire job from the XML feed
+    for (const xmlJob of borderTireJobs) {
+      try {
+        // Clean up HTML formatting in description
+        let cleanDescription = xmlJob.description || '';
+        
+        // Fix common formatting issues
+        cleanDescription = cleanDescription
+          // Fix spacing issues
+          .replace(/\s+/g, ' ')
+          // Fix spacing after commas
+          .replace(/,\s*/g, ', ')
+          // Fix spacing after periods
+          .replace(/\.\s*/g, '. ')
+          // Fix spacing after colons
+          .replace(/:\s*/g, ': ')
+          // Fix spacing after semicolons
+          .replace(/;\s*/g, '; ')
+          // Fix spacing after question marks
+          .replace(/\?\s*/g, '? ')
+          // Fix spacing after exclamation marks
+          .replace(/!\s*/g, '! ')
+          // Fix spacing around parentheses
+          .replace(/\(\s*/g, '(').replace(/\s*\)/g, ')')
+          // Fix spacing around brackets
+          .replace(/\[\s*/g, '[').replace(/\s*\]/g, ']')
+          // Fix spacing around braces
+          .replace(/\{\s*/g, '{').replace(/\s*\}/g, '}')
+          // Fix spacing around quotes
+          .replace(/"\s*/g, '"').replace(/\s*"/g, '"')
+          // Fix spacing around apostrophes
+          .replace(/'\s*/g, "'").replace(/\s*'/g, "'")
+          // Fix spacing around hyphens
+          .replace(/\s*-\s*/g, '-')
+          // Fix spacing around en dashes
+          .replace(/\s*–\s*/g, ' – ')
+          // Fix spacing around em dashes
+          .replace(/\s*—\s*/g, ' — ')
+          // Fix spacing around dollar signs
+          .replace(/\$\s*/g, '$')
+          // Fix spacing around percentage signs
+          .replace(/\s*%/g, '%')
+          // Fix spacing around plus signs
+          .replace(/\s*\+\s*/g, '+')
+          // Fix spacing around equals signs
+          .replace(/\s*=\s*/g, '=');
+        
+        // Extract job data from XML
+        const jobData = {
+          title: xmlJob.title || '',
+          description: cleanDescription,
+          requirements: xmlJob.requirements || '',
+          isActive: true,
+          location: `${xmlJob.city || ''}, ${xmlJob.state || ''}`.trim(),
+          company: 'Border Tire',
+          jobType: xmlJob.jobtype || '',
+          salary: xmlJob.salary || '',
+          externalId: xmlJob.referencenumber || xmlJob.id || '',
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Debug logging to see what we're trying to match
+        console.log(`Trying to match job: ${jobData.title} (externalId: ${jobData.externalId})`);
+        
+        // Look for an existing job with the same external ID, title, or similar title
+        let existingJob = existingJobs.find(job => {
+          // Debug logging for each existing job
+          console.log(`Comparing with existing job: ${job.title} (externalId: ${job.externalId || 'none'})`);
+          
+          // Check if externalId matches (if both exist)
+          const externalIdMatch = job.externalId && jobData.externalId && 
+                                 job.externalId.toString() === jobData.externalId.toString();
+          
+          // Check if title matches exactly (case-insensitive)
+          const exactTitleMatch = job.title && jobData.title && 
+                                 job.title.toLowerCase().trim() === jobData.title.toLowerCase().trim();
+          
+          // Check if title is similar (contains or is contained by)
+          const similarTitleMatch = job.title && jobData.title && (
+                                   job.title.toLowerCase().includes(jobData.title.toLowerCase()) ||
+                                   jobData.title.toLowerCase().includes(job.title.toLowerCase())
+                                 );
+          
+          // Check if location matches (if both exist)
+          const locationMatch = job.location && jobData.location && 
+                               job.location.toLowerCase().trim() === jobData.location.toLowerCase().trim();
+          
+          // Log the match result
+          if (externalIdMatch) console.log(`  - externalId match found for ${job.title}`);
+          if (exactTitleMatch) console.log(`  - exact title match found for ${job.title}`);
+          if (similarTitleMatch && !exactTitleMatch) console.log(`  - similar title match found for ${job.title}`);
+          if (locationMatch) console.log(`  - location match found for ${job.title}`);
+          
+          // Match if any of the conditions are true
+          return externalIdMatch || exactTitleMatch || 
+                (similarTitleMatch && locationMatch) || // Only use similar title if location also matches
+                (job.company === 'Border Tire' && similarTitleMatch); // Or if it's a Border Tire job with similar title
+        });
+        
+        if (existingJob) {
+          // Update existing job
+          console.log(`Updating existing job: ${jobData.title}`);
+          await jobsCollection.doc(existingJob.id).update(jobData);
+          updatedJobIds.add(existingJob.id);
+          jobsUpdated.push(jobData.title);
+        } else {
+          // Add new job
+          console.log(`Adding new job: ${jobData.title}`);
+          const newJobRef = await jobsCollection.add(jobData);
+          updatedJobIds.add(newJobRef.id);
+          jobsAdded.push(jobData.title);
+        }
+      } catch (jobError) {
+        console.error(`Error processing job ${xmlJob.title || 'unknown'}:`, jobError);
+        // Continue with the next job
+      }
+    }
+    
+    // Log all jobs that were updated
+    console.log('Jobs that were updated:');
+    updatedJobIds.forEach(id => {
+      const job = existingJobs.find(j => j.id === id);
+      if (job) console.log(`  - ${job.title} (${id})`);
+    });
+    
+    // Log all existing jobs that weren't updated
+    console.log('Existing jobs that were not updated:');
+    existingJobs.forEach(job => {
+      if (!updatedJobIds.has(job.id)) {
+        console.log(`  - ${job.title} (${job.id}), externalId: ${job.externalId || 'none'}`);
+      }
+    });
+    
+    // Mark jobs not in the feed as inactive, but ONLY if they're not Border Tire jobs
+    // This prevents Border Tire jobs from being incorrectly marked as inactive
+    for (const existingJob of existingJobs) {
+      if (!updatedJobIds.has(existingJob.id) && existingJob.isActive !== false) {
+        // Skip Border Tire jobs to prevent them from being marked inactive
+        if (existingJob.company === 'Border Tire') {
+          console.log(`Skipping Border Tire job to prevent marking as inactive: ${existingJob.title} (${existingJob.id})`);
+          continue;
+        }
+        
+        console.log(`Marking job as inactive: ${existingJob.title} (${existingJob.id}), externalId: ${existingJob.externalId || 'none'}`);
+        await jobsCollection.doc(existingJob.id).update({ 
+          isActive: false,
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        });
+        jobsInactivated.push(existingJob.title);
+      }
+    }
+    
+      console.log('Manual job update completed successfully');
+      
+      // Return a summary of the changes
+      res.status(200).send({
+        success: true,
+        summary: {
+          totalJobsInFeed: jobs.length,
+          totalExistingJobs: existingJobs.length,
+          jobsAdded,
+          jobsUpdated,
+          jobsInactivated,
+          addedCount: jobsAdded.length,
+          updatedCount: jobsUpdated.length,
+          inactivatedCount: jobsInactivated.length
+        }
+      });
+    } catch (error: any) {
+      console.error('Error in manual job update:', error);
+      res.status(500).send({ error: error.message });
+    }
+  });
+});
 
 // HTTP endpoint for testing the email functionality
 export const testEmail = functions.https.onRequest(async (req: functions.https.Request, res: functions.Response) => {

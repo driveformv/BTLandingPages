@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getAllJobListings, addJobListing, updateJobListing, deleteJobListing } from '../../firestoreAdmin';
+import { 
+  getAllJobListings, 
+  addJobListing, 
+  updateJobListing, 
+  deleteJobListing,
+  syncJobsFromXmlFeed,
+  markBorderTireJobsActive
+} from '../../firestoreAdmin';
 
 const JobsManagement = () => {
   const [jobs, setJobs] = useState([]);
@@ -16,6 +23,8 @@ const JobsManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('title');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [syncing, setSyncing] = useState(false);
+  const [activating, setActivating] = useState(false);
 
   // Fetch jobs on component mount
   useEffect(() => {
@@ -114,6 +123,52 @@ const JobsManagement = () => {
       setError('Failed to delete job. Please try again.');
     }
   };
+  
+  // Handle job sync from XML feed
+  const handleSyncJobs = async () => {
+    try {
+      setSyncing(true);
+      setError(null);
+      
+      const result = await syncJobsFromXmlFeed();
+      
+      // Show success message
+      alert(`Jobs synced successfully!\n\nAdded: ${result.summary.addedCount}\nUpdated: ${result.summary.updatedCount}\nInactivated: ${result.summary.inactivatedCount}`);
+      
+      // Refresh jobs list
+      await fetchJobs();
+    } catch (error) {
+      console.error('Error syncing jobs:', error);
+      setError('Failed to sync jobs from XML feed. Please try again later.');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Handle marking all Border Tire jobs as active
+  const handleActivateJobs = async () => {
+    try {
+      setActivating(true);
+      setError(null);
+      
+      const result = await markBorderTireJobsActive();
+      
+      // Show success message
+      if (result.updatedJobs && result.updatedJobs.length > 0) {
+        alert(`Successfully marked ${result.updatedJobs.length} Border Tire jobs as active.`);
+      } else {
+        alert('All Border Tire jobs are already active.');
+      }
+      
+      // Refresh jobs list
+      await fetchJobs();
+    } catch (error) {
+      console.error('Error activating jobs:', error);
+      setError('Failed to mark Border Tire jobs as active. Please try again later.');
+    } finally {
+      setActivating(false);
+    }
+  };
 
   // Handle sort
   const handleSort = (field) => {
@@ -171,13 +226,31 @@ const JobsManagement = () => {
       {/* Page Title */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Manage Jobs</h2>
-        <button 
-          className="admin-btn admin-btn-primary"
-          onClick={openAddForm}
-        >
-          <i className="mdi mdi-plus-circle admin-btn-icon"></i>
-          Add New Job
-        </button>
+        <div className="d-flex gap-2">
+          <button 
+            className="admin-btn admin-btn-secondary"
+            onClick={handleSyncJobs}
+            disabled={syncing || activating}
+          >
+            <i className={`mdi ${syncing ? 'mdi-loading mdi-spin' : 'mdi-sync'} admin-btn-icon`}></i>
+            {syncing ? 'Syncing...' : 'Sync Jobs'}
+          </button>
+          <button 
+            className="admin-btn admin-btn-success"
+            onClick={handleActivateJobs}
+            disabled={syncing || activating}
+          >
+            <i className={`mdi ${activating ? 'mdi-loading mdi-spin' : 'mdi-check-all'} admin-btn-icon`}></i>
+            {activating ? 'Activating...' : 'Activate All Jobs'}
+          </button>
+          <button 
+            className="admin-btn admin-btn-primary"
+            onClick={openAddForm}
+          >
+            <i className="mdi mdi-plus-circle admin-btn-icon"></i>
+            Add New Job
+          </button>
+        </div>
       </div>
       
       {error && (

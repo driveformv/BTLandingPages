@@ -3,7 +3,7 @@
 # Exit on error
 set -e
 
-echo "===== Deploying Firebase Cloud Functions for Email Sending ====="
+echo "===== Deploying Firebase Cloud Functions for Email Sending and Job Updates ====="
 
 # Check if Firebase CLI is installed
 if ! command -v firebase &> /dev/null; then
@@ -48,5 +48,12 @@ cd ..
 firebase deploy --only functions
 
 echo "===== Deployment complete! ====="
-echo "You can now test the email functionality by submitting a job application."
+echo "You can now test the following functionality:"
+echo "1. Email sending by submitting a job application"
+echo "2. XML feed job updates by making a POST request to the manualUpdateJobs endpoint:"
+echo "   curl -X POST https://us-central1-[YOUR-PROJECT-ID].cloudfunctions.net/manualUpdateJobs"
+echo ""
+echo "The job update function will also run automatically at midnight (Mountain Time) every day."
 echo "Check the Firebase Functions logs for any errors: https://console.firebase.google.com/project/_/functions/logs"
+echo ""
+echo "For more information about the XML feed job update functionality, see the XML_FEED_JOBS_README.md file."

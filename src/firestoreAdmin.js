@@ -205,6 +205,72 @@ export const updateEmailSettings = async (settings) => {
   }
 };
 
+/**
+ * Trigger manual sync of jobs from XML feed
+ * @returns {Promise<Object>} - Result of the sync operation
+ */
+export const syncJobsFromXmlFeed = async () => {
+  try {
+    // Use a hardcoded project ID since we know it
+    const projectId = 'landing-pages-ca8fc';
+    
+    // Call the manualUpdateJobs HTTP endpoint
+    const response = await fetch(
+      `https://us-central1-${projectId}.cloudfunctions.net/manualUpdateJobs`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('Jobs synced successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error syncing jobs from XML feed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Mark all Border Tire jobs as active
+ * @returns {Promise<Object>} - Result of the operation
+ */
+export const markBorderTireJobsActive = async () => {
+  try {
+    // Use a hardcoded project ID since we know it
+    const projectId = 'landing-pages-ca8fc';
+    
+    // Call the markBorderTireJobsActive HTTP endpoint
+    const response = await fetch(
+      `https://us-central1-${projectId}.cloudfunctions.net/markBorderTireJobsActive`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('Border Tire jobs marked as active successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error marking Border Tire jobs as active:', error);
+    throw error;
+  }
+};
+
 // Example usage:
 /*
 // Add a new job
@@ -239,4 +305,7 @@ updateEmailSettings({
   cc: ["manager@example.com"],
   bcc: ["records@example.com"]
 });
+
+// Sync jobs from XML feed
+syncJobsFromXmlFeed();
 */

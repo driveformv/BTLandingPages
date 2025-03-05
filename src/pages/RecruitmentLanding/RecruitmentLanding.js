@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './RecruitmentStyles.css';
 import RecruitmentNavbar from "./RecruitmentNavbar";
 import HeroSection from "./HeroSection";
+import RetreadTechnicianRole from "./RetreadTechnicianRole";
 import CompanyOverview from "./CompanyOverview";
 import JobListings from "./JobListings";
 import EmployeeBenefits from "./EmployeeBenefits";
@@ -26,11 +27,11 @@ class RecruitmentLanding extends Component {
                 {/* Hero Section */}
                 <HeroSection />
 
+                {/* Retread Technician Role */}
+                <RetreadTechnicianRole />
+
                 {/* Company Overview */}
                 <CompanyOverview />
-
-                {/* Job Listings */}
-                <JobListings />
 
                 {/* Employee Benefits */}
                 <EmployeeBenefits />
@@ -40,6 +41,9 @@ class RecruitmentLanding extends Component {
 
                 {/* Call to Action */}
                 <CallToAction />
+
+                {/* Job Listings */}
+                <JobListings />
 
                 {/* Recruitment Footer */}
                 <RecruitmentFooter />

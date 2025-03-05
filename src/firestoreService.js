@@ -25,9 +25,18 @@ export const addDocument = async (collectionName, data) => {
 };
 
 // Get all documents from a collection
-export const getDocuments = async (collectionName) => {
+export const getDocuments = async (collectionName, activeOnly = true) => {
   try {
-    const querySnapshot = await getDocs(collection(db, collectionName));
+    let q;
+    
+    // If it's the jobs collection and activeOnly is true, only get active jobs
+    if (collectionName === 'jobs' && activeOnly) {
+      q = query(collection(db, collectionName), where('isActive', '==', true));
+    } else {
+      q = collection(db, collectionName);
+    }
+    
+    const querySnapshot = await getDocs(q);
     const documents = [];
     querySnapshot.forEach((doc) => {
       documents.push({ id: doc.id, ...doc.data() });
