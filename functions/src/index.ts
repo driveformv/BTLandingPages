@@ -394,25 +394,47 @@ export const updateJobsFromXmlFeed = functions.pubsub
             // Fix spacing around equals signs
             .replace(/\s*=\s*/g, '=');
           
-          // Extract job data from XML
-          const jobData = {
-            title: xmlJob.title || '',
-            description: cleanDescription,
-            requirements: xmlJob.requirements || '',
-            isActive: true,
-            location: `${xmlJob.city || ''}, ${xmlJob.state || ''}`.trim(),
-            company: 'Border Tire',
-            jobType: xmlJob.jobtype || '',
-            salary: xmlJob.salary || '',
-            externalId: xmlJob.referencenumber || xmlJob.id || '',
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-          };
+        // Extract job data from XML
+        const jobData = {
+          title: xmlJob.title || '',
+          description: cleanDescription,
+          requirements: xmlJob.requirements || '',
+          isActive: true,
+          company: 'Border Tire',
+          jobType: xmlJob.jobtype || '',
+          city: xmlJob.city || '',
+          state: xmlJob.state || '',
+          postalcode: xmlJob.postalcode || '',
+          country: xmlJob.country || '',
+          salary: xmlJob.salary || '',
+          externalId: xmlJob.referencenumber || xmlJob.id || '',
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        };
           
-          // Look for an existing job with the same external ID or title
-          let existingJob = existingJobs.find(job => 
-            (job.externalId && job.externalId === jobData.externalId) || 
-            (job.title === jobData.title)
-          );
+          // Look for an existing job with the same external ID only
+          let existingJob = null;
+          
+          // First try to match by external ID (most reliable)
+          if (jobData.externalId) {
+            existingJob = existingJobs.find(job => 
+              job.externalId && job.externalId.toString() === jobData.externalId.toString()
+            );
+            
+            if (existingJob) {
+              console.log(`Found job match by externalId: ${jobData.externalId}`);
+            }
+          }
+          
+          // If no match by external ID, try to match by title as fallback
+          if (!existingJob && jobData.title) {
+            existingJob = existingJobs.find(job => 
+              job.title && job.title === jobData.title && job.company === 'Border Tire'
+            );
+            
+            if (existingJob) {
+              console.log(`Found job match by title: ${jobData.title}`);
+            }
+          }
           
           if (existingJob) {
             // Update existing job
@@ -426,19 +448,27 @@ export const updateJobsFromXmlFeed = functions.pubsub
             updatedJobIds.add(newJobRef.id);
           }
         } catch (jobError) {
-          console.error(`Error processing job ${xmlJob.title || 'unknown'}:`, jobError);
+          console.error("Error processing job:", jobError);
           // Continue with the next job
         }
       }
       
-      // Mark jobs not in the feed as inactive
+      // Mark jobs not in the feed as inactive, but ONLY if they're not Border Tire jobs
+      const jobsInactivated: string[] = [];
       for (const existingJob of existingJobs) {
-        if (!updatedJobIds.has(existingJob.id)) {
-          console.log(`Marking job as inactive: ${existingJob.title}`);
+        if (!updatedJobIds.has(existingJob.id) && existingJob.isActive !== false) {
+          // Skip Border Tire jobs to prevent them from being marked inactive
+          if (existingJob.company === 'Border Tire') {
+            console.log("Skipping Border Tire job to prevent marking as inactive:", existingJob.title || "unknown job", "("+existingJob.id+")");
+            continue;
+          }
+          
+          console.log("Marking job as inactive:", existingJob.title || "unknown job", "("+existingJob.id+")", "externalId:", existingJob.externalId || 'none');
           await jobsCollection.doc(existingJob.id).update({ 
             isActive: false,
             lastUpdated: admin.firestore.FieldValue.serverTimestamp()
           });
+          jobsInactivated.push(existingJob.title || "unknown job");
         }
       }
       
@@ -642,51 +672,33 @@ export const manualUpdateJobs = functions.https.onRequest(async (req: functions.
           description: cleanDescription,
           requirements: xmlJob.requirements || '',
           isActive: true,
-          location: `${xmlJob.city || ''}, ${xmlJob.state || ''}`.trim(),
           company: 'Border Tire',
           jobType: xmlJob.jobtype || '',
+          city: xmlJob.city || '',
+          state: xmlJob.state || '',
+          postalcode: xmlJob.postalcode || '',
+          country: xmlJob.country || '',
           salary: xmlJob.salary || '',
           externalId: xmlJob.referencenumber || xmlJob.id || '',
           lastUpdated: admin.firestore.FieldValue.serverTimestamp()
         };
         
         // Debug logging to see what we're trying to match
-        console.log(`Trying to match job: ${jobData.title} (externalId: ${jobData.externalId})`);
+        console.log("Trying to match job:", jobData.title, "(externalId:", jobData.externalId, ")");
         
-        // Look for an existing job with the same external ID, title, or similar title
-        let existingJob = existingJobs.find(job => {
-          // Debug logging for each existing job
-          console.log(`Comparing with existing job: ${job.title} (externalId: ${job.externalId || 'none'})`);
-          
-          // Check if externalId matches (if both exist)
-          const externalIdMatch = job.externalId && jobData.externalId && 
-                                 job.externalId.toString() === jobData.externalId.toString();
-          
-          // Check if title matches exactly (case-insensitive)
-          const exactTitleMatch = job.title && jobData.title && 
-                                 job.title.toLowerCase().trim() === jobData.title.toLowerCase().trim();
-          
-          // Check if title is similar (contains or is contained by)
-          const similarTitleMatch = job.title && jobData.title && (
-                                   job.title.toLowerCase().includes(jobData.title.toLowerCase()) ||
-                                   jobData.title.toLowerCase().includes(job.title.toLowerCase())
-                                 );
-          
-          // Check if location matches (if both exist)
-          const locationMatch = job.location && jobData.location && 
-                               job.location.toLowerCase().trim() === jobData.location.toLowerCase().trim();
-          
-          // Log the match result
-          if (externalIdMatch) console.log(`  - externalId match found for ${job.title}`);
-          if (exactTitleMatch) console.log(`  - exact title match found for ${job.title}`);
-          if (similarTitleMatch && !exactTitleMatch) console.log(`  - similar title match found for ${job.title}`);
-          if (locationMatch) console.log(`  - location match found for ${job.title}`);
-          
-          // Match if any of the conditions are true
-          return externalIdMatch || exactTitleMatch || 
-                (similarTitleMatch && locationMatch) || // Only use similar title if location also matches
-                (job.company === 'Border Tire' && similarTitleMatch); // Or if it's a Border Tire job with similar title
-        });
+// Look for an existing job with the same external ID only
+let existingJob = null;
+for (const job of existingJobs) {
+  // Skip jobs without externalId
+  if (!job.externalId || !jobData.externalId) continue;
+  
+  // Check if externalId matches
+  if (job.externalId.toString() === jobData.externalId.toString()) {
+    console.log("Found matching job by externalId:", job.externalId);
+    existingJob = job;
+    break;
+  }
+}
         
         if (existingJob) {
           // Update existing job
@@ -702,7 +714,7 @@ export const manualUpdateJobs = functions.https.onRequest(async (req: functions.
           jobsAdded.push(jobData.title);
         }
       } catch (jobError) {
-        console.error(`Error processing job ${xmlJob.title || 'unknown'}:`, jobError);
+        console.error("Error processing job:", jobError);
         // Continue with the next job
       }
     }
@@ -711,14 +723,14 @@ export const manualUpdateJobs = functions.https.onRequest(async (req: functions.
     console.log('Jobs that were updated:');
     updatedJobIds.forEach(id => {
       const job = existingJobs.find(j => j.id === id);
-      if (job) console.log(`  - ${job.title} (${id})`);
+      if (job) console.log("  -", job.title || "unknown job", "("+id+")");
     });
     
     // Log all existing jobs that weren't updated
     console.log('Existing jobs that were not updated:');
     existingJobs.forEach(job => {
       if (!updatedJobIds.has(job.id)) {
-        console.log(`  - ${job.title} (${job.id}), externalId: ${job.externalId || 'none'}`);
+        console.log("  -", job.title || "unknown job", "("+job.id+")", "externalId:", job.externalId || 'none');
       }
     });
     
@@ -728,16 +740,16 @@ export const manualUpdateJobs = functions.https.onRequest(async (req: functions.
       if (!updatedJobIds.has(existingJob.id) && existingJob.isActive !== false) {
         // Skip Border Tire jobs to prevent them from being marked inactive
         if (existingJob.company === 'Border Tire') {
-          console.log(`Skipping Border Tire job to prevent marking as inactive: ${existingJob.title} (${existingJob.id})`);
+          console.log("Skipping Border Tire job to prevent marking as inactive:", existingJob.title || "unknown job", "("+existingJob.id+")");
           continue;
         }
         
-        console.log(`Marking job as inactive: ${existingJob.title} (${existingJob.id}), externalId: ${existingJob.externalId || 'none'}`);
+        console.log("Marking job as inactive:", existingJob.title || "unknown job", "("+existingJob.id+")", "externalId:", existingJob.externalId || 'none');
         await jobsCollection.doc(existingJob.id).update({ 
           isActive: false,
           lastUpdated: admin.firestore.FieldValue.serverTimestamp()
         });
-        jobsInactivated.push(existingJob.title);
+        jobsInactivated.push(existingJob.title || "unknown job");
       }
     }
     

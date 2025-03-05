@@ -188,7 +188,7 @@
 }
 
 .user-role {
-  font-size: 12px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
 }
@@ -199,7 +199,7 @@
   color: rgba(255, 255, 255, 0.7);
   border-radius: 4px;
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   transition: all var(--transition-speed);
   margin-top: 10px;
@@ -396,7 +396,7 @@
 }
 
 .stat-card-label {
-  font-size: 0.875rem;
+  font-size: 14px;
   color: var(--text-muted);
   margin: 0 0 5px;
   text-transform: uppercase;
@@ -412,7 +412,7 @@
 }
 
 .stat-card-change {
-  font-size: 0.75rem;
+  font-size: 14px;
   display: flex;
   align-items: center;
 }
@@ -453,7 +453,7 @@
   color: var(--text-color);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 14px;
   letter-spacing: 0.5px;
   padding: 15px;
   border-bottom: 1px solid var(--border-color);
@@ -513,7 +513,7 @@
 
 .admin-table-info {
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 14px;
 }
 
 .admin-pagination {
@@ -557,14 +557,14 @@
   align-items: center;
   padding: 5px 10px;
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: 14px;
   font-weight: 500;
   text-transform: capitalize;
 }
 
 .status-badge-icon {
   margin-right: 5px;
-  font-size: 0.875rem;
+  font-size: 14px;
 }
 
 .status-badge-pending {
@@ -610,7 +610,7 @@
   padding: 8px 16px;
   border-radius: 4px;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 14px;
   cursor: pointer;
   transition: all var(--transition-speed);
   border: none;
@@ -694,7 +694,7 @@
 
 .admin-btn-sm {
   padding: 5px 10px;
-  font-size: 0.75rem;
+  font-size: 14px;
 }
 
 .admin-btn-lg {
@@ -837,7 +837,7 @@
   border-radius: 6px;
   background-color: #fff;
   color: var(--text-color);
-  font-size: 0.875rem;
+  font-size: 14px;
   transition: all var(--transition-speed);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -877,7 +877,7 @@
 
 .admin-form-text {
   margin-top: 5px;
-  font-size: 0.75rem;
+  font-size: 14px;
   color: var(--text-muted);
 }
 

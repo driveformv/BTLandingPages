@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container, Row, Col, Card, CardBody, Button, Spinner } from "reactstrap";
 import RecruitmentSectionTitle from "./RecruitmentSectionTitle";
 import { getDocuments } from "../../firestoreService";
+import "./RecruitmentStyles.css";
 
 // Fallback job data in case Firestore fetch fails
 const fallbackJobs = [
@@ -43,7 +44,8 @@ class JobListings extends Component {
     this.state = {
       jobs: [],
       loading: true,
-      error: null
+      error: null,
+      expandedJobs: {} // Track which jobs are expanded
     };
   }
 
@@ -72,16 +74,42 @@ class JobListings extends Component {
     }
   };
   scrollToApplication = (jobId) => {
-    const applicationForm = document.getElementById("application");
-    if (applicationForm) {
-      applicationForm.scrollIntoView({ behavior: "smooth" });
-      
-      // Set the selected job in a form dropdown if it exists
+    const target = document.getElementById("application-form-container") || document.getElementById("application") || document.getElementById("hero-application");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
       const jobSelect = document.getElementById("preferredRole");
       if (jobSelect) {
         jobSelect.value = jobId;
       }
     }
+  };
+
+  // Toggle job description expansion
+  toggleJobDescription = (jobId) => {
+    this.setState(prevState => ({
+      expandedJobs: {
+        ...prevState.expandedJobs,
+        [jobId]: !prevState.expandedJobs[jobId]
+      }
+    }));
+  };
+
+  // Truncate description for preview
+  truncateDescription = (description, isExpanded) => {
+    if (!description) return "";
+    
+    // If expanded, show full description
+    if (isExpanded) return description;
+    
+    // Otherwise, truncate to ~100 characters
+    const maxLength = 100;
+    if (description.length <= maxLength) return description;
+    
+    // Find the last space before maxLength to avoid cutting words
+    const truncated = description.substr(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    
+    return truncated.substr(0, lastSpace) + '...';
   };
 
   render() {
@@ -113,10 +141,34 @@ class JobListings extends Component {
                           <Card className="job-card border-0 shadow rounded">
                             <CardBody>
                               <h5>{job.title}</h5>
-                              <div 
-                                className="text-muted small" 
-                                dangerouslySetInnerHTML={{ __html: job.description }}
-                              />
+                              {(job.city || job.state) && (
+                                <div className="job-location text-muted small mb-2">
+                                  <i className="mdi mdi-map-marker me-1"></i>
+                                  {[job.city, job.state].filter(Boolean).join(', ')}
+                                </div>
+                              )}
+                              <div className="job-description-container">
+                                <div 
+                                  className="text-muted small job-description" 
+                                  dangerouslySetInnerHTML={{ 
+                                    __html: this.truncateDescription(
+                                      job.description, 
+                                      this.state.expandedJobs[job.id]
+                                    ) 
+                                  }}
+                                />
+                                
+                                {job.description && job.description.length > 100 && (
+                                  <Button 
+                                    color="link" 
+                                    className="read-more-btn p-0 mt-1"
+                                    onClick={() => this.toggleJobDescription(job.id)}
+                                  >
+                                    {this.state.expandedJobs[job.id] ? 'Show Less' : 'Read More'}
+                                  </Button>
+                                )}
+                              </div>
+                              
                               <Button 
                                 color="orange" 
                                 onClick={() => this.scrollToApplication(job.id)}

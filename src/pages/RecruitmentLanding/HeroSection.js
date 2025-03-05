@@ -1,5 +1,19 @@
 import React, { Component } from "react";
-import { Container, Row, Col, Button } from "reactstrap";
+import { Container, Row, Col, Button, Card } from "reactstrap";
+import ApplicationForm from "./ApplicationForm";
+
+// Custom form component for the hero section
+class HeroApplicationForm extends Component {
+  render() {
+    return (
+      <div className="hero-application-form" id="hero-application">
+        <Card className="shadow-lg border-0 rounded-lg p-4">
+          <ApplicationForm inHeroSection={true} />
+        </Card>
+      </div>
+    );
+  }
+}
 
 class HeroSection extends Component {
   scrollToSection = (sectionId) => {
@@ -12,36 +26,25 @@ class HeroSection extends Component {
   render() {
     return (
       <React.Fragment>
-        <section className="section bg-home home-half" id="home" data-image-src="images/bg-home.jpg">
-          <div className="bg-overlay" style={{ background: "linear-gradient(to right, #f09105, #dc8505)", opacity: 0.95 }}></div>
-          <Container>
-            <Row>
-              <Col
-                lg={{ size: 8, offset: 2 }}
-                className="text-white text-center"
-              >
+        <section className="section bg-home home-half" id="home">
+          <div className="bg-overlay" style={{ background: "linear-gradient(to right, #f37423, #e06316)", opacity: 0.95 }}></div>
+          <Container fluid className="py-0">
+            <Row className="justify-content-center align-items-center">
+              {/* Left Column - Hero Text */}
+              <Col lg={6} md={12} className="text-white text-center text-lg-start px-4 px-lg-5 mb-3 mb-lg-0">
                 <h1 className="home-title">
                   Join the Border Tire Family – Drive Your Career Forward 🚀
                 </h1>
-                <p className="pt-3 home-desc mx-auto">
-                  Welcome to Border Tire MRT (Michelin Retread Technologies) – where we retread tires and build futures. 
+                <p className="pt-2 home-desc mb-3">
+                  Welcome to Border Tire Retread Plant MRT (Michelin Retread Technologies) – where we retread tires and build futures. 
                   We're hiring at least 30 retread technicians. No experience? No problem!
                 </p>
-                <div className="mt-4">
-                  <Button
-                    onClick={() => this.scrollToSection("application")}
-                    className="btn btn-orange mt-2 mr-2"
-                    style={{ backgroundColor: "#ffffff", color: "#f09105" }}
-                  >
-                    Apply Now
-                  </Button>
-                  <Button
-                    onClick={() => this.scrollToSection("jobs")}
-                    className="btn btn-outline-light mt-2"
-                  >
-                    View Open Positions
-                  </Button>
-                </div>
+                {/* Apply button removed as requested since form is already in hero section */}
+              </Col>
+              
+              {/* Right Column - Application Form */}
+              <Col lg={6} md={12} className="px-4 px-lg-5">
+                <HeroApplicationForm />
               </Col>
             </Row>
           </Container>

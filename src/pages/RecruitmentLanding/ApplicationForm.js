@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Container, Row, Col, Form, FormGroup, Label, Input, Button, FormFeedback, Alert } from "reactstrap";
 import RecruitmentSectionTitle from "./RecruitmentSectionTitle";
+import PropTypes from "prop-types";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { addDocument, updateDocument, getDocuments } from "../../firestoreService";
@@ -14,6 +15,14 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 const SUPPORTED_FORMATS = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
 
 class ApplicationForm extends Component {
+  static propTypes = {
+    inHeroSection: PropTypes.bool
+  };
+
+  static defaultProps = {
+    inHeroSection: false
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -195,6 +204,7 @@ class ApplicationForm extends Component {
 
   render() {
     const { formSubmitted, submitError, selectedFileName, utmParams } = this.state;
+    const { inHeroSection } = this.props;
     
     const initialValues = {
       fullName: "",
@@ -221,6 +231,198 @@ class ApplicationForm extends Component {
           value => value && SUPPORTED_FORMATS.includes(value.type))
     });
 
+    // If in hero section, we'll use a more compact layout
+    if (inHeroSection) {
+      return (
+        <React.Fragment>
+          <div id="application-form-container">
+            <h4 className="text-center mb-3" style={{ color: "#f37423" }}>Apply Now</h4>
+            
+            {formSubmitted ? (
+              <Alert color="success" className="mt-2">
+                <h5 className="alert-heading">Application Submitted!</h5>
+                <p className="small mb-0">
+                  Thank you for your interest in joining the Border Tire family! We have received your application and will review it shortly.
+                </p>
+              </Alert>
+            ) : (
+              <div className="custom-form mt-2">
+                {submitError && (
+                  <Alert color="danger" className="small py-2">{submitError}</Alert>
+                )}
+                
+                <Formik
+                  initialValues={initialValues}
+                  validationSchema={validationSchema}
+                  onSubmit={this.handleSubmit}
+                >
+                  {({
+                    values,
+                    errors,
+                    touched,
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    isSubmitting,
+                    setFieldValue
+                  }) => (
+                    <Form id="application-form" onSubmit={handleSubmit}>
+                        <FormGroup className="mb-2">
+                        <Input
+                          type="text"
+                          name="fullName"
+                          id="fullName"
+                          placeholder="Full Name *"
+                          value={values.fullName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          invalid={!!(touched.fullName && errors.fullName)}
+                          className="divi-style-input"
+                        />
+                        <FormFeedback className="small">{errors.fullName}</FormFeedback>
+                      </FormGroup>
+                      
+                      <FormGroup>
+                        <Input
+                          type="email"
+                          name="email"
+                          id="email"
+                          placeholder="Email Address *"
+                          value={values.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          invalid={!!(touched.email && errors.email)}
+                          className="divi-style-input"
+                        />
+                        <FormFeedback className="small">{errors.email}</FormFeedback>
+                      </FormGroup>
+                      
+                      <FormGroup>
+                        <Input
+                          type="tel"
+                          name="phone"
+                          id="phone"
+                          placeholder="Phone Number *"
+                          value={values.phone}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          invalid={!!(touched.phone && errors.phone)}
+                          className="divi-style-input"
+                        />
+                        <FormFeedback className="small">{errors.phone}</FormFeedback>
+                      </FormGroup>
+                      
+                      <FormGroup>
+                        <Input
+                          type="select"
+                          name="experience"
+                          id="experience"
+                          value={values.experience}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          invalid={!!(touched.experience && errors.experience)}
+                          className="divi-style-input"
+                        >
+                          <option value="">Work Experience *</option>
+                          <option value="0-1">Less than 1 year</option>
+                          <option value="1-3">1-3 years</option>
+                          <option value="3-5">3-5 years</option>
+                          <option value="5+">5+ years</option>
+                        </Input>
+                        <FormFeedback className="small">{errors.experience}</FormFeedback>
+                      </FormGroup>
+                      
+                      <FormGroup>
+                        <Input
+                          type="select"
+                          name="preferredRole"
+                          id="preferredRole"
+                          value={values.preferredRole}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          invalid={!!(touched.preferredRole && errors.preferredRole)}
+                          className="divi-style-input"
+                        >
+                          <option value="">Preferred Role *</option>
+                          {this.state.loadingJobs ? (
+                            <option value="" disabled>Loading jobs...</option>
+                          ) : this.state.jobsError ? (
+                            <option value="" disabled>{this.state.jobsError}</option>
+                          ) : (
+                            this.state.jobs.map(job => (
+                              <option key={job.id} value={job.id}>
+                                {job.title}
+                              </option>
+                            ))
+                          )}
+                        </Input>
+                        <FormFeedback className="small">{errors.preferredRole}</FormFeedback>
+                      </FormGroup>
+                      
+                      <FormGroup>
+                        <Input
+                          type="select"
+                          name="availability"
+                          id="availability"
+                          value={values.availability}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          invalid={!!(touched.availability && errors.availability)}
+                          className="divi-style-input"
+                        >
+                          <option value="">Availability *</option>
+                          <option value="immediate">Immediate</option>
+                          <option value="2weeks">2 weeks notice</option>
+                          <option value="1month">1 month notice</option>
+                          <option value="other">Other (specify in resume)</option>
+                        </Input>
+                        <FormFeedback className="small">{errors.availability}</FormFeedback>
+                      </FormGroup>
+                      
+                      <FormGroup>
+                        <div className="custom-file divi-style-file">
+                          <Input
+                            type="file"
+                            className="custom-file-input"
+                            id="resume"
+                            name="resume"
+                            onChange={(event) => this.handleFileChange(event, setFieldValue)}
+                            onBlur={handleBlur}
+                            invalid={!!(touched.resume && errors.resume)}
+                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                          />
+                          <Label className="custom-file-label" for="resume">
+                            {selectedFileName || "Resume Upload (PDF, DOC) *"}
+                          </Label>
+                        </div>
+                        {touched.resume && errors.resume && (
+                          <div className="text-danger mt-1 small">{errors.resume}</div>
+                        )}
+                      </FormGroup>
+                      
+                      <div className="text-center" style={{ marginTop: '3rem' }}>
+                        <Button
+                          color="orange"
+                          type="submit"
+                          disabled={isSubmitting}
+                          size="sm"
+                          className="text-white"
+                          style={{ backgroundColor: "#f37423", borderColor: "#f37423" }}
+                        >
+                          {isSubmitting ? "Submitting..." : "Send Application"}
+                        </Button>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
+              </div>
+            )}
+          </div>
+        </React.Fragment>
+      );
+    }
+    
+    // Standard full-page application form
     return (
       <React.Fragment>
         <section className="section" id="application">
@@ -253,7 +455,7 @@ class ApplicationForm extends Component {
                     </p>
                   </Alert>
                 ) : (
-                  <div className="custom-form mt-4">
+                  <div id="application-form-container" className="custom-form mt-4">
                     {submitError && (
                       <Alert color="danger">{submitError}</Alert>
                     )}
@@ -283,7 +485,7 @@ class ApplicationForm extends Component {
                         isSubmitting,
                         setFieldValue
                       }) => (
-                        <Form onSubmit={handleSubmit}>
+                        <Form id="application-form" onSubmit={handleSubmit}>
                           <Row>
                             <Col md={6}>
                               <FormGroup>
@@ -433,7 +635,7 @@ class ApplicationForm extends Component {
                             )}
                           </FormGroup>
                           
-                          <div className="text-center mt-4">
+                          <div className="text-center" style={{ marginTop: '6rem' }}>
                             <Button
                               color="orange"
                               type="submit"

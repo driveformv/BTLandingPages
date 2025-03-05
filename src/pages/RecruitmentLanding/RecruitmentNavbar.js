@@ -24,7 +24,6 @@ class RecruitmentNavbar extends Component {
         { id: 2, idnm: "company", navheading: "About" },
         { id: 3, idnm: "jobs", navheading: "Jobs" },
         { id: 4, idnm: "benefits", navheading: "Benefits" },
-        { id: 5, idnm: "application", navheading: "Apply" },
       ],
       isOpenMenu: false,
     };
@@ -128,12 +127,15 @@ class RecruitmentNavbar extends Component {
                           type="button"
                           color="orange"
                           className="navbar-btn btn-rounded waves-effect waves-light"
-                          onClick={() => {
-                            const applicationForm = document.getElementById("application");
-                            if (applicationForm) {
-                              applicationForm.scrollIntoView({ behavior: "smooth" });
-                            }
-                          }}
+onClick={() => {
+  const target = document.getElementById("application-form-container") || document.getElementById("application") || document.getElementById("hero-application");
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.location.hash = "application";
+  } else {
+    window.location.href = window.location.pathname + "#application";
+  }
+}}
                         >
                           Apply Now
                         </Button>

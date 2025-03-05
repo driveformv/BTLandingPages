@@ -1,12 +1,32 @@
 #!/bin/bash
 
-# Script to call the markBorderTireJobsActive Cloud Function
-# This function marks all Border Tire jobs as active in Firestore
+# This script activates all Border Tire jobs and fixes the Cloud Functions code
 
-echo "Calling markBorderTireJobsActive Cloud Function..."
-
-# Call the Cloud Function using curl
-curl -X POST https://us-central1-landing-pages-ca8fc.cloudfunctions.net/markBorderTireJobsActive
-
+echo "===== STEP 1: Checking current jobs in database ====="
+node check-jobs-table.js
 echo ""
-echo "Done!"
+
+echo "===== STEP 2: Checking XML feed ====="
+node check-xml-companies.js
+echo ""
+
+echo "===== STEP 3: Marking Border Tire jobs as active ====="
+node mark-border-tire-jobs-active.js
+echo ""
+
+echo "===== STEP 4: Fixing Cloud Functions code ====="
+node fix-cloud-functions.js
+echo ""
+
+echo "===== STEP 5: Rebuilding Cloud Functions ====="
+cd functions && npm run build
+echo ""
+
+echo "===== STEP 6: Checking jobs after fix ====="
+cd .. && node check-jobs-table.js
+echo ""
+
+echo "===== COMPLETE ====="
+echo "All Border Tire jobs should now be marked as active."
+echo "The Cloud Functions code has been fixed to prevent this issue from happening again."
+echo "To deploy the updated Cloud Functions, run: ./deploy-functions.sh"

@@ -1,137 +1,92 @@
-# XML Feed Job Update Functionality
+# XML Feed Jobs Integration
 
-This document explains the XML feed job update functionality implemented for Border Tire's recruitment website.
+This document explains how the XML feed integration works and how to troubleshoot issues with jobs being marked as inactive.
 
 ## Overview
 
-The system automatically imports job listings from an XML feed provided by MVT Holdings and updates the Firestore database. The jobs are then displayed on the Border Tire recruitment website.
+The system fetches job listings from an XML feed (https://mvtholdings.jobs/feeds/indeed.xml) and updates the Firestore database with the latest job information. This happens in two ways:
 
-## Features
+1. **Scheduled Updates**: A Cloud Function runs daily at midnight (America/Denver time) to fetch the latest jobs.
+2. **Manual Updates**: You can trigger an update manually using the HTTP endpoint.
 
-- **Scheduled Updates**: Jobs are automatically updated daily at midnight (Mountain Time)
-- **Manual Updates**: Jobs can be updated manually via an HTTP endpoint
-- **Border Tire Jobs Only**: Only jobs for Border Tire are imported from the XML feed
-- **Formatting**: Job descriptions are properly formatted for display on the website
-- **Inactive Jobs**: Jobs that are no longer in the XML feed are marked as inactive
+## Key Improvements
 
-## Implementation Details
+The following improvements have been made to the job update process:
 
-### Cloud Functions
+1. **Better Job Matching**: Jobs are now matched primarily by their external ID (reference number), with title matching as a fallback for Border Tire jobs.
+2. **Border Tire Job Protection**: Border Tire jobs are never marked as inactive, even if they're not found in the XML feed.
+3. **TypeScript Error Fixes**: All TypeScript errors have been fixed to ensure the code compiles correctly.
 
-Two Firebase Cloud Functions have been implemented:
+## Troubleshooting Scripts
 
-1. **updateJobsFromXmlFeed**: A scheduled function that runs daily at midnight (Mountain Time)
-2. **manualUpdateJobs**: An HTTP endpoint for manually triggering the job update process
+Several scripts have been created to help diagnose and fix issues with the job listings:
 
-### XML Feed Source
+### 1. Check Jobs Table
 
-The XML feed is fetched from: `https://mvtholdings.jobs/feeds/indeed.xml`
-
-### Job Processing
-
-For each job in the XML feed:
-
-1. Check if the job is for Border Tire (company field equals "Border Tire")
-2. Clean up HTML formatting in the job description
-3. Extract job data (title, description, location, etc.)
-4. Check if the job already exists in the database
-   - If it exists, update it
-   - If it doesn't exist, add it
-5. Mark jobs not in the feed as inactive
-
-### HTML Formatting
-
-The job descriptions from the XML feed are processed to ensure proper formatting:
-
-- Fix spacing issues (multiple spaces, spacing after punctuation, etc.)
-- Fix spacing around special characters (parentheses, brackets, quotes, etc.)
-- Fix spacing around currency symbols and other special characters
-
-## Usage
-
-### Automatic Updates
-
-The `updateJobsFromXmlFeed` function runs automatically at midnight (Mountain Time) every day.
-
-### Manual Updates
-
-There are several ways to manually manage the job update process:
-
-#### 1. Using the Admin Interface
-
-The Jobs Management page in the admin dashboard includes two important buttons:
-
-##### a. "Sync Jobs" Button
-
-This button allows administrators to manually trigger the XML feed job update process directly from the web interface. When clicked, the button will:
-
-- Show a loading spinner while the sync is in progress
-- Call the `manualUpdateJobs` HTTP endpoint to trigger the XML feed job update
-- Display a success message with details about the jobs that were added, updated, or inactivated
-- Refresh the jobs list to show the latest data
-
-##### b. "Activate All Jobs" Button
-
-This button allows administrators to mark all Border Tire jobs as active, regardless of their current status. This is particularly useful if jobs were incorrectly marked as inactive during the sync process. When clicked, the button will:
-
-- Show a loading spinner while the activation is in progress
-- Call the `markBorderTireJobsActive` HTTP endpoint to mark all Border Tire jobs as active
-- Display a success message with details about the jobs that were activated
-- Refresh the jobs list to show the latest data
-
-#### 2. Using the Command Line
-
-To manually trigger the job update process from the command line, use the following command:
+This script checks the current state of jobs in the Firestore database.
 
 ```bash
-./test-job-update.sh landing-pages-ca8fc
+node check-jobs-table.js
 ```
 
-This script makes a POST request to the `manualUpdateJobs` HTTP endpoint.
+### 2. Check XML Feed
 
-To manually mark all Border Tire jobs as active from the command line, use the following command:
+This script fetches and analyzes the XML feed to see what jobs are available.
+
+```bash
+node check-xml-companies.js
+```
+
+### 3. Mark Border Tire Jobs as Active
+
+This script marks all Border Tire jobs in the database as active.
+
+```bash
+node mark-border-tire-jobs-active.js
+```
+
+### 4. Test Job Update
+
+This script runs all the diagnostic scripts in sequence to check the state of jobs before and after marking Border Tire jobs as active.
+
+```bash
+./test-job-update.sh
+```
+
+### 5. Activate Border Tire Jobs
+
+This script activates all Border Tire jobs and rebuilds the Cloud Functions with the fixed code.
 
 ```bash
 ./activate-border-tire-jobs.sh
 ```
 
-This script makes a POST request to the `markBorderTireJobsActive` HTTP endpoint.
+## Deployment
 
-### Known Issues
-
-#### Jobs Being Marked as Inactive
-
-In some cases, the XML feed job update process may incorrectly mark jobs as inactive even though they exist in the XML feed. This can happen due to:
-
-1. Differences in job titles or external IDs between the database and the XML feed
-2. Formatting differences in the job data
-3. Matching algorithm limitations
-
-If you notice jobs being incorrectly marked as inactive after a sync, simply use the "Activate All Jobs" button to mark them as active again.
-
-## Testing
-
-To test the XML feed parsing functionality, use the following command:
+After making changes to the Cloud Functions code, you need to deploy the changes to make them take effect:
 
 ```bash
-node test-xml-feed.js
+./deploy-functions.sh
 ```
 
-This script fetches the XML feed, parses it, and displays information about the jobs.
+## Manual Job Update
 
-## Troubleshooting
-
-If jobs are not being updated correctly, check the Firebase Functions logs:
+You can trigger a manual job update by sending a POST request to the `manualUpdateJobs` endpoint:
 
 ```bash
-firebase functions:log --project landing-pages-ca8fc
+curl -X POST https://your-firebase-project.web.app/manualUpdateJobs
 ```
 
-Look for error messages related to the `updateJobsFromXmlFeed` or `manualUpdateJobs` functions.
+## How the Job Matching Works
 
-## Future Improvements
+1. For each job in the XML feed:
+   - First, try to match by external ID (reference number)
+   - If no match is found, try to match by title (for Border Tire jobs only)
+   - If a match is found, update the existing job
+   - If no match is found, create a new job
 
-- Add error handling for XML feed fetch failures
-- Add email notifications for job update failures
-- Add support for additional job fields from the XML feed
-- Improve HTML formatting for job descriptions
+2. For jobs not found in the feed:
+   - If it's a Border Tire job, skip it (keep it active)
+   - If it's not a Border Tire job, mark it as inactive
+
+This ensures that Border Tire jobs are always kept active, even if they're not in the XML feed.

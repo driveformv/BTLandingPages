@@ -6,7 +6,6 @@ import RetreadTechnicianRole from "./RetreadTechnicianRole";
 import CompanyOverview from "./CompanyOverview";
 import JobListings from "./JobListings";
 import EmployeeBenefits from "./EmployeeBenefits";
-import ApplicationForm from "./ApplicationForm";
 import RecruitmentFooter from './RecruitmentFooter';
 import CallToAction from './CallToAction';
 
@@ -35,9 +34,6 @@ class RecruitmentLanding extends Component {
 
                 {/* Employee Benefits */}
                 <EmployeeBenefits />
-
-                {/* Application Form */}
-                <ApplicationForm />
 
                 {/* Call to Action */}
                 <CallToAction />

@@ -9,7 +9,7 @@ class EmployeeBenefits extends Component {
         <section className="section bg-light" id="benefits">
           <Container>
             <RecruitmentSectionTitle
-              title="Why Work at Border Tire MRT?"
+              title="Why Work at Border Tire Retread Plant MRT?"
               description="Join a company that values quality, safety, and people. We offer more than just a job - we offer a career with growth opportunities."
             />
 

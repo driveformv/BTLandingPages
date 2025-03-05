@@ -18,6 +18,11 @@ const JobsManagement = () => {
     title: '',
     description: '',
     requirements: '',
+    jobType: '',
+    city: '',
+    state: '',
+    postalcode: '',
+    country: '',
     isActive: true
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,6 +57,11 @@ const JobsManagement = () => {
       title: '',
       description: '',
       requirements: '',
+      jobType: '',
+      city: '',
+      state: '',
+      postalcode: '',
+      country: '',
       isActive: true
     });
     setEditingJob(null);
@@ -64,6 +74,11 @@ const JobsManagement = () => {
       title: job.title || '',
       description: job.description || '',
       requirements: job.requirements || '',
+      jobType: job.jobType || '',
+      city: job.city || '',
+      state: job.state || '',
+      postalcode: job.postalcode || '',
+      country: job.country || '',
       isActive: job.isActive !== false // Default to true if not specified
     });
     setEditingJob(job);
@@ -481,6 +496,99 @@ const JobsManagement = () => {
                     <small className="admin-form-text">
                       List qualifications, skills, experience, and education requirements
                     </small>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="jobType">
+                      <i className="mdi mdi-briefcase-clock-outline me-1"></i>
+                      Job Type
+                    </label>
+                    <input
+                      type="text"
+                      className="admin-form-control"
+                      id="jobType"
+                      name="jobType"
+                      placeholder="e.g., Full-Time, Part-Time, Contract"
+                      value={formData.jobType}
+                      onChange={handleInputChange}
+                    />
+                    <small className="admin-form-text">
+                      The type of employment (Full-Time, Part-Time, Contract, etc.)
+                    </small>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" htmlFor="city">
+                          <i className="mdi mdi-city me-1"></i>
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          className="admin-form-control"
+                          id="city"
+                          name="city"
+                          placeholder="Enter city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" htmlFor="state">
+                          <i className="mdi mdi-map-marker me-1"></i>
+                          State
+                        </label>
+                        <input
+                          type="text"
+                          className="admin-form-control"
+                          id="state"
+                          name="state"
+                          placeholder="Enter state"
+                          value={formData.state}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" htmlFor="postalcode">
+                          <i className="mdi mdi-mailbox me-1"></i>
+                          Postal Code
+                        </label>
+                        <input
+                          type="text"
+                          className="admin-form-control"
+                          id="postalcode"
+                          name="postalcode"
+                          placeholder="Enter postal code"
+                          value={formData.postalcode}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" htmlFor="country">
+                          <i className="mdi mdi-earth me-1"></i>
+                          Country
+                        </label>
+                        <input
+                          type="text"
+                          className="admin-form-control"
+                          id="country"
+                          name="country"
+                          placeholder="Enter country"
+                          value={formData.country}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="admin-form-switch mb-4">

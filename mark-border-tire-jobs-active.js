@@ -1,83 +1,80 @@
-/**
- * Script to mark all Border Tire jobs as active in Firestore
- * 
- * This script connects to Firestore, finds all jobs with company='Border Tire',
- * and updates their isActive field to true.
- */
-
-console.log('Starting script to mark Border Tire jobs as active...');
-
 const admin = require('firebase-admin');
-console.log('Firebase admin loaded');
+const serviceAccount = require('./firebase-config.js');
 
-try {
-  const serviceAccount = require('./hiring.bordertire.com-20250304T104611.json');
-  console.log('Service account loaded');
+// Initialize Firebase Admin
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
-  // Initialize Firebase Admin with the service account
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
-  console.log('Firebase admin initialized');
-
-  const db = admin.firestore();
-  console.log('Firestore initialized');
-} catch (error) {
-  console.error('Error initializing Firebase:', error);
-}
+const db = admin.firestore();
 
 async function markBorderTireJobsActive() {
   try {
-    console.log('Fetching Border Tire jobs from Firestore...');
+    console.log('Starting to mark Border Tire jobs as active...');
     
-    // Query for all jobs with company='Border Tire'
-    const jobsRef = db.collection('jobs');
-    const snapshot = await jobsRef.where('company', '==', 'Border Tire').get();
+    // Get all Border Tire jobs from Firestore
+    const borderTireJobsSnapshot = await db.collection('jobs')
+      .where('company', '==', 'Border Tire')
+      .get();
     
-    if (snapshot.empty) {
+    if (borderTireJobsSnapshot.empty) {
       console.log('No Border Tire jobs found in Firestore.');
       return;
     }
     
-    console.log(`Found ${snapshot.size} Border Tire jobs in Firestore.`);
+    console.log(`Found ${borderTireJobsSnapshot.size} Border Tire jobs in Firestore.`);
     
-    // Update each job to be active
+    // Update each Border Tire job to be active
     const updatePromises = [];
-    snapshot.forEach(doc => {
+    const updatedJobs = [];
+    const alreadyActiveJobs = [];
+    
+    borderTireJobsSnapshot.forEach(doc => {
       const jobData = doc.data();
       console.log(`Job ID: ${doc.id}`);
-      console.log(`Title: ${jobData.title}`);
-      console.log(`Location: ${jobData.location || 'N/A'}`);
-      console.log(`Current isActive status: ${jobData.isActive}`);
+      console.log(`Title: ${jobData.title || 'No title'}`);
+      console.log(`Location: ${jobData.location || 'Unknown'}`);
+      console.log(`Current isActive status: ${jobData.isActive === true ? 'Active' : 'Inactive'}`);
+      console.log(`External ID: ${jobData.externalId || 'None'}`);
       
       // Only update if not already active
       if (jobData.isActive !== true) {
-        console.log(`Marking job as active: ${jobData.title}`);
+        console.log(`Marking job as active: ${jobData.title || 'No title'}`);
         updatePromises.push(
-          jobsRef.doc(doc.id).update({ 
+          db.collection('jobs').doc(doc.id).update({ 
             isActive: true,
             lastUpdated: admin.firestore.FieldValue.serverTimestamp()
           })
         );
+        updatedJobs.push(jobData.title || 'No title');
       } else {
-        console.log(`Job already active: ${jobData.title}`);
+        console.log(`Job already active: ${jobData.title || 'No title'}`);
+        alreadyActiveJobs.push(jobData.title || 'No title');
       }
-      console.log('-----------------------------------');
+      console.log('---');
     });
     
     // Wait for all updates to complete
     if (updatePromises.length > 0) {
       await Promise.all(updatePromises);
-      console.log(`Successfully marked ${updatePromises.length} Border Tire jobs as active.`);
+      console.log(`\nSuccessfully marked ${updatePromises.length} Border Tire jobs as active.`);
+      console.log('\nJobs updated:');
+      updatedJobs.forEach((title, index) => {
+        console.log(`  ${index + 1}. ${title}`);
+      });
     } else {
-      console.log('All Border Tire jobs are already active.');
+      console.log('\nAll Border Tire jobs are already active.');
     }
+    
+    console.log(`\nTotal Border Tire jobs: ${borderTireJobsSnapshot.size}`);
+    console.log(`Jobs updated: ${updatedJobs.length}`);
+    console.log(`Jobs already active: ${alreadyActiveJobs.length}`);
     
   } catch (error) {
     console.error('Error marking Border Tire jobs as active:', error);
   } finally {
-    // Terminate the Firebase Admin app
-    admin.app().delete();
+    // Terminate the Firebase app
+    await admin.app().delete();
   }
 }
 

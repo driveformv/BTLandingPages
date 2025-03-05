@@ -18,8 +18,8 @@ a.btn-orange,
 button.btn-orange,
 .btn.btn-orange {
   background-color: #ffffff !important;
-  border-color: #f09105 !important;
-  color: #f09105 !important;
+  border-color: #f37423 !important;
+  color: #f37423 !important;
 }
 
 .btn-orange:hover, 
@@ -31,15 +31,15 @@ a.btn-orange:focus,
 a.btn-orange:active,
 a.btn-orange.active {
   background-color: #ffffff !important;
-  border-color: #dc8505 !important;
-  color: #dc8505 !important;
+  border-color: #e06316 !important;
+  color: #e06316 !important;
 }
 
 /* Apply orange text to all white buttons */
 button.btn-orange,
 a.btn-orange,
 .btn.btn-orange {
-  color: #f09105 !important;
+  color: #f37423 !important;
   background-color: #ffffff !important;
 }
 
@@ -49,37 +49,37 @@ a.btn-orange,
   height: 2px;
   margin-right: auto;
   margin-left: auto;
-  background-color: #f09105 !important;
+  background-color: #f37423 !important;
 }
 
 /* Override any teal colors */
 .section-title-border {
-  background-color: #f09105 !important;
+  background-color: #f37423 !important;
 }
 
 /* Override active nav link color */
 #mySidenav .nav-link:hover, 
 #mySidenav .active .nav-link {
-  color: #f09105 !important;
+  color: #f37423 !important;
 }
 
 /* Override any other teal colors */
 .bg-primary {
-  background-color: #f09105 !important;
+  background-color: #f37423 !important;
 }
 
 .text-primary {
-  color: #f09105 !important;
+  color: #f37423 !important;
 }
 
 .border-primary {
-  border-color: #f09105 !important;
+  border-color: #f37423 !important;
 }
 
 /* Hiring Event Box Styling */
 .hiring-event-box {
   background-color: #ffffff;
-  border: 2px solid #f09105;
+  border: 2px solid #f37423;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -96,4 +96,221 @@ a.btn-orange,
 
 .hiring-event-box p {
   color: #333333;
+}
+
+/* Job Listings Styles */
+.job-card {
+  transition: all 0.3s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.job-location {
+  display: flex;
+  align-items: center;
+  margin-top: -5px;
+  margin-bottom: 8px;
+  color: #6c757d;
+}
+
+.job-location i {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+.job-description-container {
+  margin-bottom: 15px;
+}
+
+.job-description {
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+
+.read-more-btn {
+  color: #f37423 !important;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.read-more-btn:hover {
+  color: #e06316 !important;
+  text-decoration: none;
+}
+
+/* Ensure the Apply Now button is always visible */
+.job-card .btn-orange {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure small text is still readable */
+.small, small {
+  font-size: 14px !important;
+}
+
+/* Improve line spacing for better readability */
+.text-muted {
+  line-height: 1.4;
+}
+
+/* Add consistent spacing between paragraphs */
+p {
+  margin-bottom: 1.2rem;
+}
+
+/* Improve spacing in list items */
+ul li {
+  margin-bottom: 0.5rem;
+  line-height: 1.8;
+}
+
+/* Remove background image from hero section to improve performance */
+.bg-home {
+  background-image: none !important;
+}
+
+/* Hero Section Application Form Styles */
+.hero-application-form {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Add scroll margin for fixed navbar */
+#application-form-container {
+  scroll-margin-top: 80px; /* Adjust based on navbar height */
+}
+
+.hero-application-form .card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.hero-application-form h4 {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.hero-application-form .form-group {
+  margin-bottom: 15px;
+}
+
+/* Make the hero section more compact */
+.section.bg-home {
+  padding-top: 125px !important;
+  padding-bottom: 50px !important;
+  margin-top: 0px !important;
+}
+
+/* Fix navbar spacing */
+.navbar-custom {
+  margin-bottom: 0px !important;
+}
+
+/* Fix hero section layout */
+.home-half {
+  padding-top: 150px !important;
+  padding-bottom: 100px !important;
+}
+
+/* Divi-style form elements */
+.divi-style-input {
+  height: auto !important;
+  padding: 12px !important;
+  font-size: 14px !important;
+  border-radius: 0 !important;
+  border-width: 0 !important;
+  border-bottom: 1px solid #ddd !important;
+  background-color: #f7f7f7 !important;
+  box-shadow: none !important;
+  color: #666 !important;
+  transition: all 0.3s ease !important;
+}
+
+.divi-style-input:focus {
+  background-color: #fff !important;
+  border-bottom-color: #f37423 !important;
+  box-shadow: none !important;
+}
+
+.divi-style-input::placeholder {
+  color: #666 !important;
+  opacity: 1 !important;
+}
+
+/* Custom styling for select elements */
+select.divi-style-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 30px !important;
+}
+
+/* Custom styling for file input */
+.divi-style-file {
+  position: relative;
+}
+
+.divi-style-file .custom-file-input {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  margin: 0;
+  opacity: 0;
+}
+
+.divi-style-file .custom-file-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: auto;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #666;
+  background-color: #f7f7f7;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  border-radius: 0;
+  box-shadow: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.divi-style-file .custom-file-label::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: block;
+  height: auto;
+  padding: 12px;
+  content: "Browse";
+  background-color: #eee;
+  border: none;
+  border-radius: 0;
+}
+
+/* Responsive adjustments for the hero section */
+@media (max-width: 991.98px) {
+  .hero-application-form {
+    margin-top: 30px;
+  }
 }
