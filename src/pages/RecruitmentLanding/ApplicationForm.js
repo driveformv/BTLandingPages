@@ -400,14 +400,18 @@ class ApplicationForm extends Component {
                         )}
                       </FormGroup>
                       
-                      <div className="text-center" style={{ marginTop: '3rem' }}>
+                      <div className="text-center">
                         <Button
                           color="orange"
                           type="submit"
                           disabled={isSubmitting}
                           size="sm"
                           className="text-white"
-                          style={{ backgroundColor: "#f37423", borderColor: "#f37423" }}
+                          style={{ 
+                            backgroundColor: "#f37423", 
+                            borderColor: "#f37423",
+                            padding: "0.25rem 0.75rem"
+                          }}
                         >
                           {isSubmitting ? "Submitting..." : "Send Application"}
                         </Button>

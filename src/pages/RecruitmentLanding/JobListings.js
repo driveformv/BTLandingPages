@@ -172,7 +172,7 @@ class JobListings extends Component {
                               <Button 
                                 color="orange" 
                                 onClick={() => this.scrollToApplication(job.id)}
-                                className="mt-2 btn-sm"
+                                className="mt-1 btn-sm"
                                 size="sm"
                               >
                                 Apply Now
