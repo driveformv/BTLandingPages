@@ -26,3 +26,10 @@ firebase-debug.log*
 
 # Local Netlify folder
 .netlify
+
+# Perplexity and MCP related files
+PERPLEXITY_README.md
+perplexity-direct.js
+**/test-perplexity.js
+**/claude_desktop_config.json
+**/cline_mcp_settings.json
