@@ -232,11 +232,21 @@ ul li {
   background-color: #ffffff;
   border-radius: 0.5rem; /* 8px */
   overflow: hidden;
+  max-width: 430px; /* Add width constraint to the container */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Add scroll margin for fixed navbar */
 #application-form-container {
   scroll-margin-top: 5rem; /* 80px */
+}
+
+/* Width constraint for hero section form only */
+.hero-application-form #application-form-container {
+  max-width: 400px; /* Add width constraint */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-application-form .card {
