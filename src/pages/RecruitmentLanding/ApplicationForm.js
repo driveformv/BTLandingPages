@@ -211,7 +211,7 @@ class ApplicationForm extends Component {
       email: "",
       phone: "",
       experience: "",
-      preferredRole: "",
+      preferredRole: "retread-technician",
       availability: "",
       resume: null
     };
@@ -344,15 +344,18 @@ class ApplicationForm extends Component {
                           className="divi-style-input"
                         >
                           <option value="">Preferred Role *</option>
+                          <option value="retread-technician">Retread Technician</option>
                           {this.state.loadingJobs ? (
                             <option value="" disabled>Loading jobs...</option>
                           ) : this.state.jobsError ? (
                             <option value="" disabled>{this.state.jobsError}</option>
                           ) : (
                             this.state.jobs.map(job => (
-                              <option key={job.id} value={job.id}>
-                                {job.title}
-                              </option>
+                              job.id !== "retread-technician" ? (
+                                <option key={job.id} value={job.id}>
+                                  {job.title}
+                                </option>
+                              ) : null
                             ))
                           )}
                         </Input>
@@ -579,15 +582,18 @@ class ApplicationForm extends Component {
                                   invalid={!!(touched.preferredRole && errors.preferredRole)}
                                 >
                                   <option value="">Select a position</option>
+                                  <option value="retread-technician">Retread Technician</option>
                                   {this.state.loadingJobs ? (
                                     <option value="" disabled>Loading jobs...</option>
                                   ) : this.state.jobsError ? (
                                     <option value="" disabled>{this.state.jobsError}</option>
                                   ) : (
                                     this.state.jobs.map(job => (
-                                      <option key={job.id} value={job.id}>
-                                        {job.title}
-                                      </option>
+                                      job.id !== "retread-technician" ? (
+                                        <option key={job.id} value={job.id}>
+                                          {job.title}
+                                        </option>
+                                      ) : null
                                     ))
                                   )}
                                 </Input>
