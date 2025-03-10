@@ -72,17 +72,18 @@ class EmployeeBenefits extends Component {
                     <CardBody>
                       <div className="testimonial-content">
                         <p className="text-muted mb-0">
-                          "I've been with Border Tire for over 5 years, and it's been a rewarding experience. The company truly values its employees and provides a supportive work environment. I'm excited about the new Redlands plant and the opportunities it will bring."
+                          "I've been with Border Tire for three years and have witnessed continuous growth among our employees. Our company focuses heavily on culture and a sense of belonging, providing our team with a supportive environment to expand their careers. 2025 will be an exciting year for us, as we just opened our facility in Las Cruces and will be opening our Mentone location later this year. Both sites will provide great opportunities locally!"
                         </p>
-                        <div className="d-flex align-items-center mt-4">
+                        <div className="d-flex align-items-center mt-5">
                           <img
-                            src="/assets/images/testimonials/user-2.jpg"
-                            alt="user"
-                            className="rounded-circle avatar-md mr-3"
+                            src="/assets/images/testimonials/Derrick_Mays_.png"
+                            alt="Derrick Mays"
+                            className="rounded-circle avatar-md mr-5"
+                            style={{ marginRight: "2rem", width: "80px", height: "80px", objectFit: "cover" }}
                           />
                           <div>
-                            <h5 className="mb-0">Michael Rodriguez</h5>
-                            <p className="text-muted mb-0">Production Manager</p>
+                            <h5 className="mb-0">Derrick Mays</h5>
+                            <p className="text-muted mb-0">Human Resources Manager</p>
                           </div>
                         </div>
                       </div>
